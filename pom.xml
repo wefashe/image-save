@@ -44,7 +44,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.wdbyte.bing.Wallpaper</mainClass>
+                            <mainClass>org.example.image.MySave</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
