@@ -30,8 +30,7 @@ jobs:
          git config --local user.email "wefashe@qq.com"
          git config --local user.name "wefashe"
          git pull
-         git add README.md
-         git add images/*
+         git add .
          git commit -m "update readme.md"
     - name: Push changes
       uses:  ad-m/github-push-action@master
