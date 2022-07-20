@@ -58,6 +58,8 @@ public class Image implements Comparable<Image>{
     }
 
     public String getUrl() {
+        // _1920x1080.jpg 高清
+        // _UHD.jpg 超高清4K
         return url;
     }
 
