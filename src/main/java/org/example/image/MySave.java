@@ -16,18 +16,14 @@ public class MySave {
         MdFile imagesFile = MdFile.getImagesFile();
         Image todayImage = Image.getTodayImage();
         readMeFile.addImage(todayImage);
-        readMeFile.writeMdFile();
         imagesFile.addImage(todayImage);
-        imagesFile.writeMdFile();
     }
 
     public static void saveSevenImage(int idx,int num) throws IOException {
         MdFile readMeFile = MdFile.getReadMeFile();
         MdFile imagesFile = MdFile.getImagesFile();
         List<Image> images = Image.getImages(idx, num);
-        readMeFile.setImages(images);
-        imagesFile.setImages(images);
-        readMeFile.writeMdFile();
-        imagesFile.writeMdFile();
+        readMeFile.addImages(images);
+        imagesFile.addImages(images);
     }
 }

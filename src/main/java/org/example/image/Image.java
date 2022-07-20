@@ -200,7 +200,7 @@ public class Image implements Comparable<Image> {
         String alt = getWith1204Alt();
         String img = getWith1204Url();
         String imgTitle = getImgTitle();
-        return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s&nbsp;&nbsp;%s<center/>", alt, img, imgTitle, link, getTitle(), getDesc());
+        return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s&nbsp;&nbsp;%s&nbsp;<sup style=\"color:red;\">*new*</sup><center/>", alt, img, imgTitle, link, getTitle(), getDesc());
     }
 
     public String getMarkdownText() {

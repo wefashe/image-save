@@ -85,18 +85,16 @@ public class MdFile extends File {
                 String alt = markdownText.substring(markdownText.indexOf("[", 2) + 1, markdownText.indexOf("&"));
                 text = markdownText.substring(markdownText.indexOf("(") + 1, markdownText.lastIndexOf("]") - 1);
                 String url = text.substring(0, text.indexOf("&"));
-                String title = text.substring(text.indexOf("\"")+1, text.indexOf("&#10;"));
-                String desc = text.substring(text.indexOf("&#10;")+5, text.lastIndexOf("\""));
+                String title = text.substring(text.indexOf("\"") + 1, text.indexOf("&#10;"));
+                String desc = text.substring(text.indexOf("&#10;") + 5, text.lastIndexOf("\""));
                 String link = markdownText.substring(markdownText.lastIndexOf("]") + 2, markdownText.lastIndexOf(")"));
                 LocalDate imageDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
                 images.add(new Image(imageDate.format(DateTimeFormatter.BASIC_ISO_DATE), url, title, desc, alt, link));
             }
         }
-        images = images.stream().distinct().collect(Collectors.toList());
-        Collections.sort(images);
     }
 
-    public void writeMdFile() throws IOException {
+    private void writeMdFile() throws IOException {
         if (images.isEmpty()) {
             return;
         }
@@ -144,7 +142,7 @@ public class MdFile extends File {
                 return Math.negateExact(month1.compareTo(month2));
             }).limit(HISTORY_ARCHIVE_NUM).forEach(pathTemp -> {
                 String name = pathTemp.getFileName().toString();
-                list.add(String.format("[%s](%s)", name.substring(0, name.lastIndexOf(".")), pathTemp.toString()));
+                list.add(String.format("[%s](%s)", name.substring(0, name.lastIndexOf(".")), pathTemp.toString().replace("\\", "/")));
             });
             if (!list.isEmpty()) {
                 Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
@@ -158,14 +156,13 @@ public class MdFile extends File {
         }
     }
 
-    public void setImages(List<Image> images) {
+    public void addImages(List<Image> images) throws IOException {
         this.images.addAll(images);
-        this.images = this.images.stream().distinct().collect(Collectors.toList());
+        writeMdFile();
     }
 
-    public void addImage(Image image) {
-        if (!images.contains(image)) {
-            this.images.add(image);
-        }
+    public void addImage(Image image) throws IOException {
+        this.images.add(image);
+        writeMdFile();
     }
 }
