@@ -13,4 +13,4 @@
 |[![春天是接吻的季节](https://cn.bing.com/th?id=OHR.KissingPuffins_ZH-CN2578608262_UHD.jpg&rf=LaDigue_UHD.jpg&pid=hp&w=3840&h=2160&rs=1&c=4 "一对大西洋海雀在接吻，设得兰群岛，苏格兰 (© Vince Burton/Minden Pictures)")](https://cn.bing.com/th?id=OHR.KissingPuffins_ZH-CN2578608262_UHD.jpg&rf=LaDigue_UHD.jpg&pid=hp&w=3840&h=2160&rs=1&c=4)<br><center>2022-07-06<center/>|[![这座岛海拔超过一英里](https://cn.bing.com/th?id=OHR.FannetteIsland_ZH-CN2395055456_UHD.jpg&rf=LaDigue_UHD.jpg&pid=hp&w=3840&h=2160&rs=1&c=4 "被翡翠湾环绕的芬尼特岛，太浩湖，加利福尼亚 (© Rachid Dahnoun/Tandem Stills + Motion)")](https://cn.bing.com/th?id=OHR.FannetteIsland_ZH-CN2395055456_UHD.jpg&rf=LaDigue_UHD.jpg&pid=hp&w=3840&h=2160&rs=1&c=4)<br><center>2022-07-05<center/>
 
 ### 历史归档:
-[2022-07](images\2022\2022-07.md)
+[2022-07](images/2022/2022-07.md)
