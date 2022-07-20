@@ -82,12 +82,13 @@ public class MdFile extends File {
                 String text = markdownText.substring(markdownText.indexOf("<center>") + 8, markdownText.indexOf("<center/>"));
                 String date = text.substring(0, text.indexOf(" "));
                 markdownText = markdownText.substring(0, markdownText.indexOf("<br/>"));
-                String alt = markdownText.substring(markdownText.indexOf("[", 2) + 1, markdownText.indexOf("]"));
+                String alt = markdownText.substring(markdownText.indexOf("[", 2) + 1, markdownText.indexOf("&"));
                 text = markdownText.substring(markdownText.indexOf("(") + 1, markdownText.lastIndexOf("]") - 1);
                 String url = text.substring(0, text.indexOf("&"));
                 String title = text.substring(text.indexOf("\"")+1, text.indexOf("&#10;"));
                 String desc = text.substring(text.indexOf("&#10;")+5, text.lastIndexOf("\""));
-                String link = markdownText.substring(markdownText.lastIndexOf("]") + 2, markdownText.lastIndexOf(")") - 1);
+                System.out.println(markdownText);
+                String link = markdownText.substring(markdownText.lastIndexOf("]") + 2, markdownText.lastIndexOf(")"));
                 LocalDate imageDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
                 images.add(new Image(imageDate.format(DateTimeFormatter.BASIC_ISO_DATE), url, title, desc, alt, link));
             }

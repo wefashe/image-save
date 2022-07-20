@@ -56,11 +56,13 @@ public class Image implements Comparable<Image> {
         this.title = escape(title);
         this.desc = escape(desc);
         if (!alt.contains("http")) {
-            this.alt = BING_URL + alt;
+            alt = BING_URL + alt;
         }
+        this.alt = alt;
         if (!link.contains("http")) {
-            this.link = BING_URL + link;
+            link = BING_URL + link;
         }
+        this.link =  link;
     }
 
     public static String getBingApi(int idx, int num) {
