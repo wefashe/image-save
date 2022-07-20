@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +48,7 @@ public class MdFile extends File {
     }
 
     public static MdFile getImagesFile() throws IOException {
-        LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now(ZoneId.of("UTC+8"));
         Path path = IMAGES_PATH.resolve(String.valueOf(now.getYear()));
         if (!Files.exists(path)) {
             Files.createDirectories(path);

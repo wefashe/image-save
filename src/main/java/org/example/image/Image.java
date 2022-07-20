@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -192,8 +193,9 @@ public class Image implements Comparable<Image> {
     }
 
     public boolean isToday() {
+        LocalDate now = LocalDate.now(ZoneId.of("UTC+8"));
         LocalDate imageDate = LocalDate.parse(date, DateTimeFormatter.BASIC_ISO_DATE);
-        return LocalDate.now().equals(imageDate);
+        return now.equals(imageDate);
     }
 
     public String getTopMarkdownText() {
