@@ -200,7 +200,7 @@ public class Image implements Comparable<Image> {
         String alt = getWith1204Alt();
         String img = getWith1204Url();
         String imgTitle = getImgTitle();
-        return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s&nbsp;&nbsp;%s&nbsp;<sup style=\"color:red;\">*new*</sup><center/>", alt, img, imgTitle, link, getTitle(), getDesc());
+        return String.format("[![%s](%s \"%s\")](%s)<br/><center><font color=#28A745 face=\"Arial\">%s&nbsp;&nbsp;%s</font>&nbsp;<sup style=\"color:red;\">*new*</sup><center/>", alt, img, imgTitle, link, getTitle(), getDesc());
     }
 
     public String getMarkdownText() {
@@ -210,7 +210,7 @@ public class Image implements Comparable<Image> {
         String date = getDate();
         String hdUrl = getHDUrl();
         String uhdUrl = getUrl();
-        return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s / [高清](%s) / [超高清4K](%s)<center/>", alt, img, imgTitle, link, date, hdUrl, uhdUrl);
+        return String.format("[![%s](%s \"%s\")](%s)<br/><center><font color=#28A745 size=-2 face=\"Arial\">%s / [高清](%s) / [超高清4K](%s)</font><center/>", alt, img, imgTitle, link, date, hdUrl, uhdUrl);
     }
 
     /**

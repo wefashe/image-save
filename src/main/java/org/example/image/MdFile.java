@@ -79,7 +79,7 @@ public class MdFile extends File {
                 if (markdownText.isEmpty()) {
                     continue;
                 }
-                String text = markdownText.substring(markdownText.indexOf("<center>") + 8, markdownText.indexOf("<center/>"));
+                String text = markdownText.substring(markdownText.lastIndexOf("\"") + 2, markdownText.indexOf("</font>"));
                 String date = text.substring(0, text.indexOf(" "));
                 markdownText = markdownText.substring(0, markdownText.indexOf("<br/>"));
                 String alt = markdownText.substring(markdownText.indexOf("[", 2) + 1, markdownText.indexOf("&"));
