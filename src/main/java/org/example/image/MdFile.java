@@ -27,13 +27,18 @@ public class MdFile extends File {
     private Path path;
     private List<Image> images;
 
-    public MdFile(String title, String pathname) throws IOException {
-        this(title, Paths.get(pathname), new ArrayList<>());
-        readMdFile();
-    }
-
     public MdFile(String title, Path path) throws IOException {
         this(title, path, new ArrayList<>());
+    }
+
+    public MdFile(String title, Path path, List<Image> images) throws IOException {
+        super(path.toString());
+        this.title = "## " + title;
+        this.path = path;
+        if (!Files.exists(path)) {
+            Files.createFile(path);
+        }
+        this.images = images;
         readMdFile();
     }
 
@@ -52,16 +57,6 @@ public class MdFile extends File {
             Files.createFile(path);
         }
         return new MdFile(String.format("必应%d年%02d月壁纸", now.getYear(), now.getMonthValue()), path);
-    }
-
-    public MdFile(String title, Path path, List<Image> images) throws IOException {
-        super(path.toString());
-        this.title = "## " + title;
-        this.path = path;
-        if (!Files.exists(path)) {
-            Files.createFile(path);
-        }
-        this.images = images;
     }
 
     private void readMdFile() throws IOException {
@@ -84,14 +79,17 @@ public class MdFile extends File {
                 if (markdownText.isEmpty()) {
                     continue;
                 }
-                String date = markdownText.substring(markdownText.indexOf("<center>") + 8, markdownText.indexOf("<center/>"));
-                markdownText = markdownText.substring(markdownText.indexOf("[") + 1, markdownText.lastIndexOf("]"));
-                String title = markdownText.substring(markdownText.indexOf("[") + 1, markdownText.lastIndexOf("]"));
-                markdownText = markdownText.substring(markdownText.lastIndexOf("]") + 2, markdownText.lastIndexOf(")"));
-                String url = markdownText.substring(0, markdownText.indexOf(" "));
-                String desc = markdownText.substring(markdownText.indexOf("\"") + 1, markdownText.lastIndexOf("\""));
+                String text = markdownText.substring(markdownText.indexOf("<center>") + 8, markdownText.indexOf("<center/>"));
+                String date = text.substring(0, text.indexOf(" "));
+                markdownText = markdownText.substring(0, markdownText.indexOf("<br/>"));
+                String alt = markdownText.substring(markdownText.indexOf("[", 2) + 1, markdownText.indexOf("]"));
+                text = markdownText.substring(markdownText.indexOf("(") + 1, markdownText.lastIndexOf("]") - 1);
+                String url = text.substring(0, text.indexOf("&"));
+                String title = text.substring(text.indexOf("\"")+1, text.indexOf("&#10;"));
+                String desc = text.substring(text.indexOf("&#10;")+5, text.lastIndexOf("\""));
+                String link = markdownText.substring(markdownText.lastIndexOf("]") + 2, markdownText.lastIndexOf(")") - 1);
                 LocalDate imageDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
-                images.add(new Image(imageDate.format(DateTimeFormatter.BASIC_ISO_DATE), url, title, desc));
+                images.add(new Image(imageDate.format(DateTimeFormatter.BASIC_ISO_DATE), url, title, desc, alt, link));
             }
         }
         images = images.stream().distinct().collect(Collectors.toList());
@@ -102,8 +100,8 @@ public class MdFile extends File {
         if (images.isEmpty()) {
             return;
         }
-        images = images.stream().distinct().collect(Collectors.toList());
         Collections.sort(images);
+        images = images.stream().distinct().collect(Collectors.toList());
         StringBuilder otherContext = new StringBuilder();
         StringBuilder todayContext = new StringBuilder();
         for (int i = 0; i < images.size(); i++) {
@@ -111,7 +109,7 @@ public class MdFile extends File {
                 break;
             }
             Image image = images.get(i);
-            if (image.isToday() && !path.startsWith(IMAGES_PATH) && todayContext.length() == 0) {
+            if (i == 0 && image.isToday() && !path.startsWith(IMAGES_PATH) && todayContext.length() == 0) {
                 todayContext.append("||\n");
                 todayContext.append("|:---:|\n");
                 todayContext.append("|").append(image.getTopMarkdownText()).append("|\n");
@@ -160,12 +158,9 @@ public class MdFile extends File {
         }
     }
 
-    public List<Image> getImages() {
-        return images;
-    }
-
     public void setImages(List<Image> images) {
-        this.images = images.stream().distinct().collect(Collectors.toList());
+        this.images.addAll(images);
+        this.images = this.images.stream().distinct().collect(Collectors.toList());
     }
 
     public void addImage(Image image) {
