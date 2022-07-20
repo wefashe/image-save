@@ -63,7 +63,7 @@ public class Image implements Comparable<Image> {
         if (!link.contains("http")) {
             link = BING_URL + link;
         }
-        this.link =  link;
+        this.link = link;
     }
 
     public static String getBingApi(int idx, int num) {
@@ -116,6 +116,10 @@ public class Image implements Comparable<Image> {
 
     public String getImgTitle() {
         return title + "&#10;" + desc;
+    }
+
+    public String getSummaryDesc() {
+        return desc.substring(0, desc.indexOf(" (©"));
     }
 
     @Override
@@ -202,7 +206,7 @@ public class Image implements Comparable<Image> {
         String alt = getWith1204Alt();
         String img = getWith1204Url();
         String imgTitle = getImgTitle();
-        return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s&nbsp;&nbsp;%s&nbsp;<sup>*new*</sup><center/>", alt, img, imgTitle, link, getTitle(), getDesc());
+        return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s，%s&nbsp;<sup>*new*</sup><center/>", alt, img, imgTitle, link, getTitle(), getSummaryDesc());
     }
 
     public String getMarkdownText() {
