@@ -87,7 +87,6 @@ public class MdFile extends File {
                 String url = text.substring(0, text.indexOf("&"));
                 String title = text.substring(text.indexOf("\"")+1, text.indexOf("&#10;"));
                 String desc = text.substring(text.indexOf("&#10;")+5, text.lastIndexOf("\""));
-                System.out.println(markdownText);
                 String link = markdownText.substring(markdownText.lastIndexOf("]") + 2, markdownText.lastIndexOf(")"));
                 LocalDate imageDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
                 images.add(new Image(imageDate.format(DateTimeFormatter.BASIC_ISO_DATE), url, title, desc, alt, link));
