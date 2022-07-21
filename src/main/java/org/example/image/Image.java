@@ -80,14 +80,14 @@ public class Image implements Comparable<Image> {
     }
 
     public String getUrl() {
-        // 手机高清 1080x1920
-        // _UHD.jpg 超高清4K  即5187x2918
+        // 默认超高清图片
         return url;
     }
 
-    public String getHDUrl() {
-        // _1920x1080.jpg 高清
-        return url.replace("_UHD.jpg", "_1920x1080.jpg");
+    public String getPixelUrl(Pixels pixel) {
+        // 设置图片的分辨率
+        String suffix = "_" + pixel.getResolution() + ".jpg";
+        return url.replace("_UHD.jpg", suffix);
     }
 
     public String getTitle() {
@@ -98,20 +98,28 @@ public class Image implements Comparable<Image> {
         return desc;
     }
 
-    public String getWith1204Url() {
-        return url + "&w=1204";
+    public String getSizeUrl(int width, int height) {
+        String condition = "";
+        if (width != 0) {
+            condition += "&w=" + width;
+        }
+        if (width != 0) {
+            condition += "&h=" + height;
+        }
+        // &w=xx&h=xx 设置图片的长宽
+        return url + condition;
     }
 
-    public String getSmallUrl() {
-        return url + "&pid=hp&w=384&h=216&rs=1&c=4";
-    }
-
-    public String getWith1204Alt() {
-        return alt + "&w=1204";
-    }
-
-    public String getSmallAlt() {
-        return alt + "&pid=hp&w=384&h=216&rs=1&c=4";
+    public String getSizeAlt(int width, int height) {
+        String condition = "";
+        if (width != 0) {
+            condition += "&w=" + width;
+        }
+        if (width != 0) {
+            condition += "&h=" + height;
+        }
+        // &w=xx&h=xx 设置图片的长宽
+        return alt + condition;
     }
 
     public String getImgTitle() {
@@ -203,19 +211,19 @@ public class Image implements Comparable<Image> {
     }
 
     public String getTopMarkdownText() {
-        String alt = getWith1204Alt();
-        String img = getWith1204Url();
+        String alt = getSizeAlt(1204, 0);
+        String img = getSizeUrl(1204, 0);
         String imgTitle = getImgTitle();
         return String.format("[![%s](%s \"%s\")](%s)<br/><center><sup>**新**</sup>&nbsp;%s，%s<center/>", alt, img, imgTitle, link, getTitle(), getSummaryDesc());
     }
 
     public String getMarkdownText() {
-        String alt = getSmallAlt();
-        String img = getSmallUrl();
+        String alt = getSizeAlt(384, 216);
+        String img = getSizeUrl(384, 216);
         String imgTitle = getImgTitle();
         String date = getDate();
-        String hdUrl = getHDUrl();
-        String uhdUrl = getUrl();
+        String hdUrl = getPixelUrl(Pixels.PIX_1920X1200);
+        String uhdUrl = getPixelUrl(Pixels.PIX_UHD);
         return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s / [高清](%s) / [超高清4K](%s)<center/>", alt, img, imgTitle, link, date, hdUrl, uhdUrl);
     }
 
