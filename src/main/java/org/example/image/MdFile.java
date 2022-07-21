@@ -101,36 +101,32 @@ public class MdFile extends File {
         }
         Collections.sort(images);
         images = images.stream().distinct().collect(Collectors.toList());
-        StringBuilder otherContext = new StringBuilder();
-        StringBuilder todayContext = new StringBuilder();
+        StringBuilder context = new StringBuilder();
         for (int i = 0; i < images.size(); i++) {
             if (i >= README_IMAGE_NUM) {
                 break;
             }
             Image image = images.get(i);
-            if (i == 0 && image.isToday() && !path.startsWith(IMAGES_PATH) && todayContext.length() == 0) {
-                todayContext.append("||\n");
-                todayContext.append("|:---:|\n");
-                todayContext.append("|").append(image.getTopMarkdownText()).append("|\n");
+            if (i == 0 && context.length() == 0 && image.isToday() && !path.startsWith(IMAGES_PATH)) {
+                context.append("||").append(System.lineSeparator());
+                context.append("|:---:|").append(System.lineSeparator());
+                context.append("|").append(image.getTopMarkdownText()).append("|").append(System.lineSeparator());
+                context.append(System.lineSeparator());
             }
 
             if (i == 0) {
-                otherContext.append("||||\n");
-                otherContext.append("|:---:|:---:|:---:|\n");
+                context.append("||||").append(System.lineSeparator());
+                context.append("|:---:|:---:|:---:|").append(System.lineSeparator());
             }
             if ((i + 1) % 3 == 0) {
-                otherContext.append("|").append(image.getMarkdownText()).append("|\n");
+                context.append("|").append(image.getMarkdownText()).append("|").append(System.lineSeparator());
             } else {
-                otherContext.append("|").append(image.getMarkdownText());
+                context.append("|").append(image.getMarkdownText());
             }
         }
-        if (todayContext.length() != 0) {
-            todayContext.append("\n");
-        }
-        todayContext.append(otherContext);
         Files.write(path, title.getBytes());
         Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
-        Files.write(path, todayContext.toString().getBytes(), StandardOpenOption.APPEND);
+        Files.write(path, context.toString().getBytes(), StandardOpenOption.APPEND);
 
         if (path.equals(README_PATH)) {
             Stream<Path> pathStream = Files.walk(IMAGES_PATH);

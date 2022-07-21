@@ -148,7 +148,7 @@ public class Image implements Comparable<Image> {
 
     @Override
     public String toString() {
-        return this.date + this.title + "\n" + this.url + "\n" + this.getDesc() + "\n";
+        return this.date + this.title + System.lineSeparator() + this.url + System.lineSeparator() + this.getDesc();
     }
 
     public static Image getImageByJson(JSONObject obj) {
@@ -206,7 +206,7 @@ public class Image implements Comparable<Image> {
         String alt = getWith1204Alt();
         String img = getWith1204Url();
         String imgTitle = getImgTitle();
-        return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s，%s&nbsp;<sup>*new*</sup><center/>", alt, img, imgTitle, link, getTitle(), getSummaryDesc());
+        return String.format("[![%s](%s \"%s\")](%s)<br/><center><sup>**新**</sup>&nbsp;%s，%s<center/>", alt, img, imgTitle, link, getTitle(), getSummaryDesc());
     }
 
     public String getMarkdownText() {
