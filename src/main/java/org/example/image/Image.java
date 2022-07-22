@@ -17,7 +17,10 @@ import java.util.Objects;
 
 public class Image implements Comparable<Image> {
 
+    // 必应域名
     private static String BING_URL = "https://cn.bing.com";
+    // 必应备用域名
+    private static String BING_BACKIP_URL = "https://s.cn.bing.net";
 
     /**
      * BING API
@@ -40,6 +43,8 @@ public class Image implements Comparable<Image> {
 
     /**
      * 获取当日的壁纸故事
+     * 已经不维护了，现只能获取21年前历史壁纸的内容
+     * @deprecated
      */
     private static String BING_COVERSTORY_API = BING_URL + "/cnhp/coverstory?d=%s";
 
@@ -96,7 +101,19 @@ public class Image implements Comparable<Image> {
 
     public String getPixelUrl(Pixels pixel) {
         // 设置图片的分辨率
-        String suffix = "_" + pixel.getResolution() + ".jpg";
+        String suffix = "_UHD.jpg";
+        String resolution = pixel.getResolution();
+        if (resolution != null && !resolution.isEmpty()) {
+            suffix = "_" + resolution + ".jpg";
+        }
+        int width = pixel.getWidth();
+        if (width != 0) {
+            suffix += "&w=" + width;
+        }
+        int height = pixel.getHeight();
+        if (height != 0) {
+            suffix += "&h=" + height;
+        }
         return url.replace("_UHD.jpg", suffix);
     }
 
@@ -117,6 +134,7 @@ public class Image implements Comparable<Image> {
             condition += "&h=" + height;
         }
         // &w=xx&h=xx 设置图片的长宽
+        // 默认超高清图片，太大了，考虑使用小分辨率展示
         return url + condition;
     }
 
@@ -233,7 +251,8 @@ public class Image implements Comparable<Image> {
         String imgTitle = getImgTitle();
         String date = getDate();
         String hdUrl = getPixelUrl(Pixels.PIX_1920X1200);
-        String uhdUrl = getPixelUrl(Pixels.PIX_UHD);
+
+        String uhdUrl = getPixelUrl(Pixels.PIX_UHD_3840X2160);
         return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s / [高清](%s) / [超高清4K](%s)<center/>", alt, img, imgTitle, link, date, hdUrl, uhdUrl);
     }
 

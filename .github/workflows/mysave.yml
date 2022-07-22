@@ -5,8 +5,10 @@ name: Java Image Save with Maven
 
 on:
   schedule:
-    # * is a special character in YAML so you have to quote this string
-    - cron:  '0 9 * * *'
+    # UTC时间与北京时间8小时时差
+    # UTC时间 1点与9点各执行一次
+    # 北京时间 9点与17点各执行一次
+    - cron:  '0 1,9 * * *'
   push:
     branches: [ main ]
 
