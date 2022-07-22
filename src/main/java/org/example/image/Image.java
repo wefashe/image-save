@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -22,11 +23,10 @@ import java.util.Objects;
 
 public class Image implements Comparable<Image> {
 
-    // 必应域名
-    private static String BING_URL = "https://cn.bing.com";
+    // 必应主域名
+    private final static String BING_MASTER_URL = "https://cn.bing.com";
     // 必应备用域名
-    private static String BING_BACKIP_URL = "https://s.cn.bing.net";
-
+    private final static String BING_BACKIP_URL = "https://s.cn.bing.net";
     /**
      * BING API
      * format	 返回的数据格式。hp为html格式；js为json格式；其他值为xml格式；缺省（或缺失）将默认返回 XML 文档数据格式
@@ -44,16 +44,17 @@ public class Image implements Comparable<Image> {
      * cc	     可选	国家（含地区）代码（Country Code）的英文缩写，表示获取相应地区的必应美图（需要国外主机，国内主机请求一律返回中国区的必应美图），目前已知的可取值范围 {ar、at、au、be、br、ca、ch、cl、cn、de、dk、es、fi、fr、hk、ie、in、it、jp、kr、nl、no、nz、ph、pt、ru、se、sg、tw、uk}，对应的地区请对照此列表 → 传送门，缺省（或缺失）将自动根据请求源 IP 所在的地区返回相应地区的美图信息（划重点，并非每个地区都有属于自己独一无二的美图，未预设美图的地区将直接引用国际版 Bing 美图。另外在配合国外主机使用此参数时抓取信息时，需要使用国际版或其它地区的必应首页地址，例如“www.bing.com”，才能获取到相应“cc”地区的美图，否则一律返回中国区的美图信息。
      * video     可选	取值范围 [0, 1]，缺省（或缺失）则默认为“0”，则不返回相应的流媒体信息（音频/视频），并不是每天都有流媒体视音频的，需要根据返回的字段键值对做判断。
      */
-    private static String BING_IMAGE_API = BING_URL + "/HPImageArchive.aspx?format=js&idx=%s&n=%s&nc=1612409408851&pid=hp&FORM=BEHPTB&uhd=1&uhdwidth=3840&uhdheight=2160&setmkt=zh-cn&cc=cn";
-
+    private final static String BING_IMAGE_API = "/HPImageArchive.aspx?format=js&idx=%s&n=%s&nc=1612409408851&pid=hp&FORM=BEHPTB&uhd=1&uhdwidth=3840&uhdheight=2160&setmkt=zh-cn&cc=cn";
     /**
      * 获取当日的壁纸故事
      * 已经不维护了，现只能获取21年前历史壁纸的内容
+     * 例如：https://cn.bing.com/cnhp/coverstory?d=20181118
      *
      * @deprecated
      */
-    private static String BING_COVERSTORY_API = BING_URL + "/cnhp/coverstory?d=%s";
+    private final static String BING_COVERSTORY_API = "/cnhp/coverstory?d=%s";
 
+    public static String BING_URL = BING_MASTER_URL;
 
     private String date;
     private String url;
@@ -69,22 +70,13 @@ public class Image implements Comparable<Image> {
 
     public Image(String date, String url, String title, String desc, String alt, String link) {
         this.date = date;
-        if (!url.contains("http")) {
-            url = BING_URL + url;
-        }
         if (url.contains("&")) {
             url = url.substring(0, url.indexOf("&"));
         }
         this.url = url;
         this.title = escape(title);
         this.desc = escape(desc);
-        if (!alt.contains("http")) {
-            alt = BING_URL + alt;
-        }
         this.alt = alt;
-        if (!link.contains("http")) {
-            link = BING_URL + link;
-        }
         this.link = link;
         this.maxPixelUrlMap = new HashMap<>();
     }
@@ -95,11 +87,11 @@ public class Image implements Comparable<Image> {
 
         num = Math.max(1, num);
         num = Math.min(8, num);
-        return String.format(BING_IMAGE_API, idx, num);
+        return String.format(makeFullUrl(BING_IMAGE_API), idx, num);
     }
 
     public static String getBingCoverstoryApi(String date) {
-        return String.format(BING_COVERSTORY_API, date);
+        return String.format(makeFullUrl(BING_COVERSTORY_API), date);
     }
 
     public String getDate() {
@@ -144,18 +136,23 @@ public class Image implements Comparable<Image> {
         return url.replaceAll("[^_]+.jpg", suffix);
     }
 
+    private static String makeFullUrl(String url) {
+        return BING_URL + url;
+    }
+
     public Map<String, String> getMaxPixelUrl() {
-        String maxPixelUrl = url.replaceAll("[^_]+.jpg", "UHD.jpg");
+        String fullMaxPixelUrl = url.replaceAll("[^_]+.jpg", "UHD.jpg");
+        fullMaxPixelUrl = makeFullUrl(fullMaxPixelUrl);
         Map<String, String> pixelUrlMap = new HashMap<>();
         BufferedImage image = null;
         try {
-            URL imageURL = URI.create(maxPixelUrl).toURL();
+            URL imageURL = URI.create(fullMaxPixelUrl).toURL();
             image = ImageIO.read(imageURL);
             int width = image.getWidth();
             int height = image.getHeight();
             if (width >= 1920 && height >= 1200) {
                 pixelUrlMap.put("name", "超高清");
-                pixelUrlMap.put("maxPixelUrl", maxPixelUrl);
+                pixelUrlMap.put("maxPixelUrl", fullMaxPixelUrl);
             }
             if (width >= 3840 && height >= 2160) {
                 pixelUrlMap.put("name", "超高清4K");
@@ -163,11 +160,11 @@ public class Image implements Comparable<Image> {
             }
             if (width >= 7680 && height >= 4320) {
                 pixelUrlMap.put("name", "超高清8K");
-                pixelUrlMap.put("maxPixelUrl", maxPixelUrl);
+                pixelUrlMap.put("maxPixelUrl", fullMaxPixelUrl);
             }
         } catch (IOException e) {
             pixelUrlMap.put("name", "超高清");
-            pixelUrlMap.put("maxPixelUrl", maxPixelUrl);
+            pixelUrlMap.put("maxPixelUrl", fullMaxPixelUrl);
         } finally {
             if (image != null) {
                 image.getGraphics().dispose();
@@ -266,6 +263,32 @@ public class Image implements Comparable<Image> {
         return new Image(date, url, title, desc, alt, link);
     }
 
+    private static JSONObject[] getImageJSONObject(int idx, int num) throws IOException {
+        boolean flag = true;
+        String jsonText = null;
+        while (flag) {
+            try {
+                String bingImageApi = Image.getBingImageApi(idx, num);
+                jsonText = IOUtils.toString(URI.create(bingImageApi), StandardCharsets.UTF_8);
+                flag = false;
+            } catch (UnknownHostException e) {
+                if (BING_BACKIP_URL.equals(BING_URL)) {
+                    flag = false;
+                } else {
+                    BING_URL = BING_BACKIP_URL;
+                }
+            }
+        }
+        if (Objects.isNull(jsonText) || jsonText.isEmpty()) {
+            throw new IOException(BING_IMAGE_API + "接口获取数据失败！");
+        }
+        JSONArray array = JSON.parseObject(jsonText).getJSONArray("images");
+        if (Objects.isNull(array) || array.isEmpty()) {
+            throw new IOException(BING_IMAGE_API + "接口获取图片数据失败！");
+        }
+        return array.toArray(new JSONObject[0]);
+    }
+
     /**
      * 获取今天的壁纸
      *
@@ -273,10 +296,8 @@ public class Image implements Comparable<Image> {
      * @throws IOException
      */
     public static Image getTodayImage() throws IOException {
-        String bingImageApi = Image.getBingImageApi(0, 1);
-        String jsonText = IOUtils.toString(URI.create(bingImageApi), StandardCharsets.UTF_8);
-        JSONObject obj = (JSONObject) JSON.parseObject(jsonText).getJSONArray("images").get(0);
-        return getImageByJson(obj);
+        JSONObject[] imageJSONObjects = getImageJSONObject(0, 1);
+        return getImageByJson(imageJSONObjects[0]);
     }
 
     /**
@@ -288,11 +309,9 @@ public class Image implements Comparable<Image> {
      * @throws IOException
      */
     public static List<Image> getImages(int idx, int num) throws IOException {
-        String bingImageApi = Image.getBingImageApi(idx, num);
-        String jsonText = IOUtils.toString(URI.create(bingImageApi), StandardCharsets.UTF_8);
-        JSONArray array = JSON.parseObject(jsonText).getJSONArray("images");
+        JSONObject[] imageJSONObjects = getImageJSONObject(idx, num);
         List<Image> images = new ArrayList<>();
-        for (JSONObject obj : array.toArray(new JSONObject[0])) {
+        for (JSONObject obj : imageJSONObjects) {
             images.add(getImageByJson(obj));
         }
         return images;
@@ -305,26 +324,36 @@ public class Image implements Comparable<Image> {
     }
 
     public String getTopMarkdownText() {
-        String alt = getShowAltBySize(1204, 677);
-        String img = getShowUrlBySize(1204, 677);
+        String fullTopShowAlt = getShowAltBySize(1204, 677);
+        fullTopShowAlt = makeFullUrl(fullTopShowAlt);
+        String fullTopShowUrl = getShowUrlBySize(1204, 677);
+        fullTopShowUrl = makeFullUrl(fullTopShowUrl);
         String imgTitle = getImgTitle();
-        return String.format("[![%s](%s \"%s\")](%s)<br/><center><sup>**新**</sup>&nbsp;%s，%s<center/>", alt, img, imgTitle, link, getTitle(), getSummaryDesc());
+        String fullLink = makeFullUrl(link);
+        return String.format("[![%s](%s \"%s\")](%s)<br/><center><sup>**新**</sup>&nbsp;%s，%s<center/>",
+                fullTopShowAlt, fullTopShowUrl, imgTitle, fullLink, getTitle(), getSummaryDesc());
     }
 
     public String getMarkdownText() {
-        String alt = getShowAltBySize(384, 216);
-        String img = getShowUrlBySize(384, 216);
+        String fullShowAlt = getShowAltBySize(384, 216);
+        fullShowAlt = makeFullUrl(fullShowAlt);
+        String fullShowUrl = getShowUrlBySize(384, 216);
+        fullShowUrl = makeFullUrl(fullShowUrl);
         String imgTitle = getImgTitle();
+        String fullLink = makeFullUrl(link);
         String date = getDate();
         // 高清图片地址
-        String hdUrl = getUrlByPixle(Pixels.PIX_1920X1200);
+        String fullHDDownUrl = getUrlByPixle(Pixels.PIX_1920X1200);
+        fullHDDownUrl = makeFullUrl(fullHDDownUrl);
         // 超高清4k图片地址
         if (maxPixelUrlMap.isEmpty()) {
             maxPixelUrlMap = getMaxPixelUrl();
         }
         String name = maxPixelUrlMap.get("name");
-        String maxPixelUrl = maxPixelUrlMap.get("maxPixelUrl");
-        return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s / [高清](%s) / [%s](%s)<center/>", alt, img, imgTitle, link, date, hdUrl, name, maxPixelUrl);
+        String fullUHDDownUrl = maxPixelUrlMap.get("maxPixelUrl");
+        fullUHDDownUrl = makeFullUrl(fullUHDDownUrl);
+        return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s / [高清](%s) / [%s](%s)<center/>",
+                fullShowAlt, fullShowUrl, imgTitle, fullLink, date, fullHDDownUrl, name, fullUHDDownUrl);
     }
 
     /**

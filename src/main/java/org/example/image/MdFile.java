@@ -87,15 +87,15 @@ public class MdFile extends File {
                 }
                 String text = markdownText.substring(markdownText.indexOf("<center>") + 8, markdownText.indexOf("<center/>"));
                 String date = text.substring(0, text.indexOf(" "));
-                String name = text.substring(text.lastIndexOf("[")+1, text.lastIndexOf("]"));
-                String maxPixelUrl = text.substring(text.lastIndexOf("(")+1, text.lastIndexOf(")"));
+                String name = text.substring(text.lastIndexOf("[") + 1, text.lastIndexOf("]"));
+                String maxPixelUrl = text.substring(text.lastIndexOf("/"), text.lastIndexOf(")"));
                 markdownText = markdownText.substring(0, markdownText.indexOf("<br/>"));
-                String alt = markdownText.substring(markdownText.indexOf("[", 2) + 1, markdownText.indexOf("&"));
+                String alt = markdownText.substring(markdownText.indexOf("/", 20), markdownText.indexOf("&"));
                 text = markdownText.substring(markdownText.indexOf("(") + 1, markdownText.lastIndexOf("]") - 1);
-                String url = text.substring(0, text.indexOf("&"));
+                String url = text.substring(text.indexOf("/", 15), text.indexOf("&"));
                 String title = text.substring(text.indexOf("\"") + 1, text.indexOf("&#10;"));
                 String desc = text.substring(text.indexOf("&#10;") + 5, text.lastIndexOf("\"")).replace("&#10;", " (") + ")";
-                String link = markdownText.substring(markdownText.lastIndexOf("]") + 2, markdownText.lastIndexOf(")"));
+                String link = markdownText.substring(markdownText.lastIndexOf("/"), markdownText.lastIndexOf(")"));
                 LocalDate imageDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
                 Image image = new Image(imageDate.format(DateTimeFormatter.BASIC_ISO_DATE), url, title, desc, alt, link);
                 image.put("name", name);
