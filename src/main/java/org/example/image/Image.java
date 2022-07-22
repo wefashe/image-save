@@ -5,14 +5,19 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.IOUtils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class Image implements Comparable<Image> {
@@ -111,7 +116,7 @@ public class Image implements Comparable<Image> {
      * @param pixel
      * @return
      */
-    public String getDownUrlByPixle(Pixels pixel) {
+    public String getUrlByPixle(Pixels pixel) {
         // 设置图片的分辨率
         String suffix = "UHD.jpg";
         String resolution = pixel.getResolution();
@@ -127,6 +132,38 @@ public class Image implements Comparable<Image> {
             suffix += "&h=" + height;
         }
         return url.replaceAll("[^_]+.jpg", suffix);
+    }
+
+    public Map<String, String> getMaxPixelUrl() {
+        String maxPixelUrl = url.replaceAll("[^_]+.jpg", "UHD.jpg");
+        Map<String, String> pixelUrlMap = new HashMap<>();
+        BufferedImage image = null;
+        try {
+            URL imageURL = URI.create(maxPixelUrl).toURL();
+            image = ImageIO.read(imageURL);
+            int width = image.getWidth();
+            int height = image.getHeight();
+            if (width >= 1920 && height >= 1200) {
+                pixelUrlMap.put("name", "超高清");
+                pixelUrlMap.put("maxPixelUrl", maxPixelUrl);
+            }
+            if (width >= 3840 && height >= 2160) {
+                pixelUrlMap.put("name", "超高清4k");
+                pixelUrlMap.put("maxPixelUrl", getUrlByPixle(Pixels.PIX_UHD_3840X2160));
+            }
+            if (width >= 7680 && height >= 4320) {
+                pixelUrlMap.put("name", "超高清8k");
+                pixelUrlMap.put("maxPixelUrl", maxPixelUrl);
+            }
+        } catch (IOException e) {
+            pixelUrlMap.put("name", "超高清");
+            pixelUrlMap.put("maxPixelUrl", maxPixelUrl);
+        } finally {
+            if (image != null) {
+                image.getGraphics().dispose();
+            }
+        }
+        return pixelUrlMap;
     }
 
     public String getTitle() {
@@ -270,10 +307,12 @@ public class Image implements Comparable<Image> {
         String imgTitle = getImgTitle();
         String date = getDate();
         // 高清图片地址
-        String hdUrl = getDownUrlByPixle(Pixels.PIX_1920X1200);
+        String hdUrl = getUrlByPixle(Pixels.PIX_1920X1200);
         // 超高清4k图片地址
-        String uhdUrl = getDownUrlByPixle(Pixels.PIX_UHD_3840X2160);
-        return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s / [高清](%s) / [超高清4K](%s)<center/>", alt, img, imgTitle, link, date, hdUrl, uhdUrl);
+        Map<String, String> maxPixelUrlMap = getMaxPixelUrl();
+        String name = maxPixelUrlMap.get("name");
+        String maxPixelUrl = maxPixelUrlMap.get("maxPixelUrl");
+        return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s / [高清](%s) / [%s](%s)<center/>", alt, img, imgTitle, link, date, hdUrl, name, maxPixelUrl);
     }
 
     /**
