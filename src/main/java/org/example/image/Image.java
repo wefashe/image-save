@@ -62,6 +62,11 @@ public class Image implements Comparable<Image> {
     private String alt;
     private String link;
 
+    /**
+     * 最大分辨率的图片信息
+     */
+    Map<String, String> maxPixelUrlMap;
+
     public Image(String date, String url, String title, String desc, String alt, String link) {
         this.date = date;
         if (!url.contains("http")) {
@@ -81,6 +86,7 @@ public class Image implements Comparable<Image> {
             link = BING_URL + link;
         }
         this.link = link;
+        this.maxPixelUrlMap = new HashMap<>();
     }
 
     public static String getBingImageApi(int idx, int num) {
@@ -108,6 +114,10 @@ public class Image implements Comparable<Image> {
     public String getPrefixUrl() {
         // 图片地址的分辨率和长宽可能会变，取前缀来确保唯一
         return url.substring(0, url.lastIndexOf("_"));
+    }
+
+    public void put(String key, String value) {
+        this.maxPixelUrlMap.put(key, value);
     }
 
     /**
@@ -207,11 +217,11 @@ public class Image implements Comparable<Image> {
     }
 
     public String getImgTitle() {
-        return title + "&#10;" + desc;
+        return title + "&#10;" + desc.replace(" (", "&#10;").replace(")", "");
     }
 
     public String getSummaryDesc() {
-        return desc.substring(0, desc.indexOf(" (©"));
+        return desc.substring(0, desc.indexOf(" ("));
     }
 
     @Override
@@ -309,7 +319,9 @@ public class Image implements Comparable<Image> {
         // 高清图片地址
         String hdUrl = getUrlByPixle(Pixels.PIX_1920X1200);
         // 超高清4k图片地址
-        Map<String, String> maxPixelUrlMap = getMaxPixelUrl();
+        if (maxPixelUrlMap.isEmpty()) {
+            maxPixelUrlMap = getMaxPixelUrl();
+        }
         String name = maxPixelUrlMap.get("name");
         String maxPixelUrl = maxPixelUrlMap.get("maxPixelUrl");
         return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s / [高清](%s) / [%s](%s)<center/>", alt, img, imgTitle, link, date, hdUrl, name, maxPixelUrl);
