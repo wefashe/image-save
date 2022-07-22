@@ -44,6 +44,7 @@ public class Image implements Comparable<Image> {
     /**
      * 获取当日的壁纸故事
      * 已经不维护了，现只能获取21年前历史壁纸的内容
+     *
      * @deprecated
      */
     private static String BING_COVERSTORY_API = BING_URL + "/cnhp/coverstory?d=%s";
@@ -99,12 +100,23 @@ public class Image implements Comparable<Image> {
         return url;
     }
 
-    public String getPixelUrl(Pixels pixel) {
+    public String getPrefixUrl() {
+        // 图片地址的分辨率和长宽可能会变，取前缀来确保唯一
+        return url.substring(0, url.lastIndexOf("_"));
+    }
+
+    /**
+     * 通过分辨率获取图片下载的地址
+     *
+     * @param pixel
+     * @return
+     */
+    public String getDownUrlByPixle(Pixels pixel) {
         // 设置图片的分辨率
-        String suffix = "_UHD.jpg";
+        String suffix = "UHD.jpg";
         String resolution = pixel.getResolution();
         if (resolution != null && !resolution.isEmpty()) {
-            suffix = "_" + resolution + ".jpg";
+            suffix = resolution + ".jpg";
         }
         int width = pixel.getWidth();
         if (width != 0) {
@@ -114,7 +126,7 @@ public class Image implements Comparable<Image> {
         if (height != 0) {
             suffix += "&h=" + height;
         }
-        return url.replace("_UHD.jpg", suffix);
+        return url.replaceAll("[^_]+.jpg", suffix);
     }
 
     public String getTitle() {
@@ -125,7 +137,15 @@ public class Image implements Comparable<Image> {
         return desc;
     }
 
-    public String getSizeUrl(int width, int height) {
+    /**
+     * 通过大小获取展示图片的地址
+     * 分辨率不用太高，加快加载的速度
+     *
+     * @param width
+     * @param height
+     * @return
+     */
+    public String getShowUrlBySize(int width, int height) {
         String condition = "";
         if (width != 0) {
             condition += "&w=" + width;
@@ -134,16 +154,15 @@ public class Image implements Comparable<Image> {
             condition += "&h=" + height;
         }
         // &w=xx&h=xx 设置图片的长宽
-        // 默认超高清图片，太大了，考虑使用小分辨率展示
-        return url + condition;
+        return url.replaceAll("[^_]+.jpg", Pixels.PIX_1366X768.getResolution() + ".jpg") + condition;
     }
 
-    public String getSizeAlt(int width, int height) {
+    public String getShowAltBySize(int width, int height) {
         String condition = "";
         if (width != 0) {
             condition += "&w=" + width;
         }
-        if (width != 0) {
+        if (height != 0) {
             condition += "&h=" + height;
         }
         // &w=xx&h=xx 设置图片的长宽
@@ -174,12 +193,12 @@ public class Image implements Comparable<Image> {
             return false;
         }
         Image image = (Image) obj;
-        return Objects.equals(desc, image.getDesc()) && Objects.equals(getDate(), image.getDate()) && Objects.equals(getUrl(), image.getUrl()) && Objects.equals(getTitle(), image.getTitle());
+        return Objects.equals(desc, image.getDesc()) && Objects.equals(getDate(), image.getDate()) && Objects.equals(getPrefixUrl(), image.getPrefixUrl()) && Objects.equals(getTitle(), image.getTitle());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(desc, date, url, title);
+        return Objects.hash(desc, date, getPrefixUrl(), title);
     }
 
     @Override
@@ -239,20 +258,21 @@ public class Image implements Comparable<Image> {
     }
 
     public String getTopMarkdownText() {
-        String alt = getSizeAlt(1204, 0);
-        String img = getSizeUrl(1204, 0);
+        String alt = getShowAltBySize(1204, 677);
+        String img = getShowUrlBySize(1204, 677);
         String imgTitle = getImgTitle();
         return String.format("[![%s](%s \"%s\")](%s)<br/><center><sup>**新**</sup>&nbsp;%s，%s<center/>", alt, img, imgTitle, link, getTitle(), getSummaryDesc());
     }
 
     public String getMarkdownText() {
-        String alt = getSizeAlt(384, 216);
-        String img = getSizeUrl(384, 216);
+        String alt = getShowAltBySize(384, 216);
+        String img = getShowUrlBySize(384, 216);
         String imgTitle = getImgTitle();
         String date = getDate();
-        String hdUrl = getPixelUrl(Pixels.PIX_1920X1200);
-
-        String uhdUrl = getPixelUrl(Pixels.PIX_UHD_3840X2160);
+        // 高清图片地址
+        String hdUrl = getDownUrlByPixle(Pixels.PIX_1920X1200);
+        // 超高清4k图片地址
+        String uhdUrl = getDownUrlByPixle(Pixels.PIX_UHD_3840X2160);
         return String.format("[![%s](%s \"%s\")](%s)<br/><center>%s / [高清](%s) / [超高清4K](%s)<center/>", alt, img, imgTitle, link, date, hdUrl, uhdUrl);
     }
 
