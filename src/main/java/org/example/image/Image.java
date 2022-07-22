@@ -158,11 +158,11 @@ public class Image implements Comparable<Image> {
                 pixelUrlMap.put("maxPixelUrl", maxPixelUrl);
             }
             if (width >= 3840 && height >= 2160) {
-                pixelUrlMap.put("name", "超高清4k");
+                pixelUrlMap.put("name", "超高清4K");
                 pixelUrlMap.put("maxPixelUrl", getUrlByPixle(Pixels.PIX_UHD_3840X2160));
             }
             if (width >= 7680 && height >= 4320) {
-                pixelUrlMap.put("name", "超高清8k");
+                pixelUrlMap.put("name", "超高清8K");
                 pixelUrlMap.put("maxPixelUrl", maxPixelUrl);
             }
         } catch (IOException e) {

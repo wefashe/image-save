@@ -44,19 +44,24 @@ public class MdFile extends File {
     }
 
     public static MdFile getReadMeFile() throws IOException {
+        // 获取README.md文件信息
         return new MdFile("必应每日壁纸", README_PATH);
     }
 
-    public static MdFile getImagesFile() throws IOException {
+    public static MdFile getCurrentMonthFile() throws IOException {
+        // 获取当前北京时间
         LocalDate now = LocalDate.now(ZoneId.of("UTC+8"));
+        // 获取当前年份的文件夹，不存在则创建
         Path path = IMAGES_PATH.resolve(String.valueOf(now.getYear()));
         if (!Files.exists(path)) {
             Files.createDirectories(path);
         }
+        // 获取当前月份的md文件，不存在则创建
         path = path.resolve(String.format("%d-%02d.md", now.getYear(), now.getMonthValue()));
         if (!Files.exists(path)) {
             Files.createFile(path);
         }
+        // 获取当前月份的md文件信息
         return new MdFile(String.format("必应%d年%02d月壁纸", now.getYear(), now.getMonthValue()), path);
     }
 
@@ -108,11 +113,13 @@ public class MdFile extends File {
         images = images.stream().distinct().collect(Collectors.toList());
         StringBuilder context = new StringBuilder();
         for (int i = 0; i < images.size(); i++) {
-            if (i >= README_IMAGE_NUM) {
+            if (i >= README_IMAGE_NUM && path.equals(README_PATH)) {
+                // 限制README.md显示图片数量
                 break;
             }
             Image image = images.get(i);
-            if (i == 0 && context.length() == 0 && image.isToday() && !path.startsWith(IMAGES_PATH)) {
+            if (i == 0 && context.length() == 0 && image.isToday() && path.equals(README_PATH)) {
+                // README.md顶部展示今天最新图片
                 context.append("||").append(System.lineSeparator());
                 context.append("|:---:|").append(System.lineSeparator());
                 context.append("|").append(image.getTopMarkdownText()).append("|").append(System.lineSeparator());
@@ -124,6 +131,7 @@ public class MdFile extends File {
                 context.append("|:---:|:---:|:---:|").append(System.lineSeparator());
             }
             if ((i + 1) % 3 == 0) {
+                // 一排展示3张图片
                 context.append("|").append(image.getMarkdownText()).append("|").append(System.lineSeparator());
             } else {
                 context.append("|").append(image.getMarkdownText());
@@ -134,19 +142,24 @@ public class MdFile extends File {
         Files.write(path, context.toString().getBytes(), StandardOpenOption.APPEND);
 
         if (path.equals(README_PATH)) {
+            // README.md显示图片的历史归档
+            // 找出所有历史归档
             Stream<Path> pathStream = Files.walk(IMAGES_PATH);
             List<String> list = new ArrayList<>();
             pathStream.filter(pathTemp -> pathTemp.toString().endsWith(".md")).sorted((o1, o2) -> {
+                // 按时间进行排序
                 String fileName1 = o1.getFileName().toString();
                 YearMonth month1 = YearMonth.parse(fileName1.substring(0, fileName1.lastIndexOf(".")));
                 String fileName2 = o2.getFileName().toString();
                 YearMonth month2 = YearMonth.parse(fileName2.substring(0, fileName2.lastIndexOf(".")));
                 return Math.negateExact(month1.compareTo(month2));
             }).limit(HISTORY_ARCHIVE_NUM).forEach(pathTemp -> {
+                // 限制展示个数，格式化展示格式
                 String name = pathTemp.getFileName().toString();
                 list.add(String.format("[%s](%s)", name.substring(0, name.lastIndexOf(".")), pathTemp.toString().replace("\\", "/")));
             });
             if (!list.isEmpty()) {
+                // 归档信息写入README.md
                 Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
                 Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
                 Files.write(path, "### 历史归档:".getBytes(), StandardOpenOption.APPEND);
