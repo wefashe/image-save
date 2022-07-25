@@ -179,6 +179,9 @@ public class MdFile extends File {
                 context.append("|").append(image.getMarkdownText());
             }
         }
+        if (!path.equals(README_PATH)) {
+            title = "[<< 返回 README](../../README.md)" + System.lineSeparator() + title;
+        }
         Files.write(path, title.getBytes());
         Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
         Files.write(path, context.toString().getBytes(), StandardOpenOption.APPEND);
@@ -207,6 +210,7 @@ public class MdFile extends File {
                 Files.write(path, "### 历史壁纸归档".getBytes(), StandardOpenOption.APPEND);
                 Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
                 String join = String.join(" | ", list);
+                join = join.replace("-01.md) | ", "-01.md)  " + System.lineSeparator());
                 Files.write(path, join.getBytes(), StandardOpenOption.APPEND);
             }
 
