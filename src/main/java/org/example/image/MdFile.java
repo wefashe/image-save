@@ -24,7 +24,6 @@ public class MdFile extends File {
     private final static Path IMAGES_PATH = Paths.get("images/");
 
     private final static int README_IMAGE_NUM = 30;
-    private final static int HISTORY_ARCHIVE_NUM = 24;
 
     private String title;
     private Path path;
@@ -201,7 +200,7 @@ public class MdFile extends File {
                 String fileName2 = o2.getFileName().toString();
                 YearMonth month2 = YearMonth.parse(fileName2.substring(0, fileName2.lastIndexOf(".")));
                 return Math.negateExact(month1.compareTo(month2));
-            }).limit(HISTORY_ARCHIVE_NUM).forEach(pathTemp -> {
+            }).forEach(pathTemp -> {
                 // 限制展示个数，格式化展示格式
                 String name = pathTemp.getFileName().toString();
                 list.add(String.format("[%s](%s)", name.substring(0, name.lastIndexOf(".")), pathTemp.toString().replace("\\", "/")));
