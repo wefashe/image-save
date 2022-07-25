@@ -8,11 +8,13 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,26 +45,61 @@ public class MdFile extends File {
         readMdFile();
     }
 
-    public static MdFile getReadMeFile() throws IOException {
+    public static void writeMdFile(Image image) throws IOException {
         // 获取README.md文件信息
-        return new MdFile("必应每日壁纸", README_PATH);
-    }
+        MdFile readMeFile = new MdFile("必应每日壁纸", README_PATH);
+        readMeFile.addImage(image);
+        readMeFile.writeMdFile();
 
-    public static MdFile getCurrentMonthFile() throws IOException {
-        // 获取当前北京时间
-        LocalDate now = LocalDate.now(ZoneId.of("UTC+8"));
-        // 获取当前年份的文件夹，不存在则创建
-        Path path = IMAGES_PATH.resolve(String.valueOf(now.getYear()));
+        LocalDate imageLocalDate = image.getLocalDate();
+        // 获取年份的文件夹，不存在则创建
+        Path path = IMAGES_PATH.resolve(String.valueOf(imageLocalDate.getYear()));
         if (!Files.exists(path)) {
             Files.createDirectories(path);
         }
-        // 获取当前月份的md文件，不存在则创建
-        path = path.resolve(String.format("%d-%02d.md", now.getYear(), now.getMonthValue()));
+        // 获取月份的md文件，不存在则创建
+        path = path.resolve(String.format("%d-%02d.md", imageLocalDate.getYear(), imageLocalDate.getMonthValue()));
         if (!Files.exists(path)) {
             Files.createFile(path);
         }
-        // 获取当前月份的md文件信息
-        return new MdFile(String.format("必应%d年%02d月壁纸", now.getYear(), now.getMonthValue()), path);
+        // 获取月份的md文件信息
+        MdFile mdFile = new MdFile(String.format("必应%d年%02d月壁纸", imageLocalDate.getYear(), imageLocalDate.getMonthValue()), path);
+        mdFile.addImage(image);
+        mdFile.writeMdFile();
+    }
+
+    public static void writeMdFiles(List<Image> images) throws IOException {
+        Map<String, MdFile> monthFileMap = new HashMap<>();
+        for (Image image : images) {
+            String imageDate = image.getDate();
+            if (monthFileMap.containsKey(imageDate)) {
+                continue;
+            }
+            LocalDate imageLocalDate = image.getLocalDate();
+            // 获取年份的文件夹，不存在则创建
+            Path path = IMAGES_PATH.resolve(String.valueOf(imageLocalDate.getYear()));
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            // 获取月份的md文件，不存在则创建
+            path = path.resolve(String.format("%d-%02d.md", imageLocalDate.getYear(), imageLocalDate.getMonthValue()));
+            if (!Files.exists(path)) {
+                Files.createFile(path);
+            }
+            // 获取月份的md文件信息
+            MdFile mdFile = new MdFile(String.format("必应%d年%02d月壁纸", imageLocalDate.getYear(), imageLocalDate.getMonthValue()), path);
+            mdFile.addImage(image);
+            monthFileMap.putIfAbsent(imageDate, mdFile);
+        }
+
+        // 获取README.md文件信息
+        MdFile readMeFile = new MdFile("必应每日壁纸", README_PATH);
+        readMeFile.addImages(images);
+        readMeFile.writeMdFile();
+
+        for (MdFile mdFile : monthFileMap.values().stream().collect(Collectors.toList())) {
+            mdFile.writeMdFile();
+        }
     }
 
     private void readMdFile() throws IOException {
@@ -105,7 +142,7 @@ public class MdFile extends File {
         }
     }
 
-    private void writeMdFile() throws IOException {
+    public void writeMdFile() throws IOException {
         if (images.isEmpty()) {
             return;
         }
@@ -176,14 +213,30 @@ public class MdFile extends File {
         images.removeAll(this.images);
         if (!images.isEmpty()) {
             this.images.addAll(images);
-            writeMdFile();
         }
     }
 
     public void addImage(Image image) throws IOException {
         if (!this.images.contains(image)) {
             this.images.add(image);
-            writeMdFile();
         }
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        MdFile mdFile = (MdFile) obj;
+        return Objects.equals(this.getPath(), mdFile.getPath());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getPath());
     }
 }

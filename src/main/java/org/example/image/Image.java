@@ -94,8 +94,13 @@ public class Image implements Comparable<Image> {
         return String.format(makeFullUrl(BING_COVERSTORY_API), date);
     }
 
+    public LocalDate getLocalDate() {
+        return LocalDate.parse(date, DateTimeFormatter.BASIC_ISO_DATE);
+    }
+
     public String getDate() {
-        return LocalDate.parse(date, DateTimeFormatter.BASIC_ISO_DATE).format(DateTimeFormatter.ISO_LOCAL_DATE);
+        LocalDate localDate = getLocalDate();
+        return localDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
     public String getUrl() {
