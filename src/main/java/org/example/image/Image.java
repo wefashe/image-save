@@ -240,12 +240,12 @@ public class Image implements Comparable<Image> {
             return false;
         }
         Image image = (Image) obj;
-        return Objects.equals(desc, image.getDesc()) && Objects.equals(getDate(), image.getDate()) && Objects.equals(getPrefixUrl(), image.getPrefixUrl()) && Objects.equals(getTitle(), image.getTitle());
+        return Objects.equals(getPrefixUrl(), image.getPrefixUrl());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(desc, date, getPrefixUrl(), title);
+        return Objects.hash(getPrefixUrl());
     }
 
     @Override

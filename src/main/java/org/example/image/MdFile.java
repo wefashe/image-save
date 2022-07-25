@@ -114,6 +114,9 @@ public class MdFile extends File {
         }
         String fitstLine = lines.get(1);
         int line = 3;
+        if (!path.equals(README_PATH)) {
+            line = 4;
+        }
         if ("||".equals(fitstLine)) {
             line = 7;
         }
