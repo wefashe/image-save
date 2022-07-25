@@ -47,7 +47,7 @@ public class MySave {
 
     public static void test() throws IOException {
         List<Image> images = new ArrayList<>();
-        for (int i = 14; i <= 20; i++) {
+        for (int i = 41; i <= 45; i++) {
             String path = "http://www.sowang.com/bbs/forum.php?mod=forumdisplay&fid=67&page=%s";
             Document doc = Jsoup.connect(String.format(path, i)).get();
 
@@ -62,12 +62,16 @@ public class MySave {
                     date = date.substring(0, 6) + date.substring(7);
                 }
                 System.out.println(date);
-                // if (!"20210525".equals(date)) {
+                // if (!"20190308".equals(date)) {
                 //     continue;
                 // }
                 Elements all = doc.select(".pcb td");
                 String url = all.select("img").first().attr("src");
-                url = url.substring(url.indexOf("/", 15), url.indexOf("&"));
+                if (url.indexOf("&") != -1) {
+                    url = url.substring(url.indexOf("/", 15), url.indexOf("&"));
+                } else {
+                    url = url.substring(url.indexOf("/", 15));
+                }
                 String text = all.first().wholeText();
                 String[] texts = text.split("\r\n");
                 String desc = "";
