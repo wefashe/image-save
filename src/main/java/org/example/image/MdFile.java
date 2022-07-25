@@ -162,7 +162,7 @@ public class MdFile extends File {
                 // 归档信息写入README.md
                 Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
                 Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
-                Files.write(path, "### 历史归档:".getBytes(), StandardOpenOption.APPEND);
+                Files.write(path, "### 历史壁纸归档".getBytes(), StandardOpenOption.APPEND);
                 Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
                 String join = String.join(" | ", list);
                 Files.write(path, join.getBytes(), StandardOpenOption.APPEND);

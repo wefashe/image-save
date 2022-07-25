@@ -150,10 +150,8 @@ public class Image implements Comparable<Image> {
             image = ImageIO.read(imageURL);
             int width = image.getWidth();
             int height = image.getHeight();
-            if (width >= 1920 && height >= 1200) {
-                pixelUrlMap.put("name", "超高清");
-                pixelUrlMap.put("maxPixelUrl", fullMaxPixelUrl);
-            }
+            pixelUrlMap.put("name", "超高清");
+            pixelUrlMap.put("maxPixelUrl", fullMaxPixelUrl);
             if (width >= 3840 && height >= 2160) {
                 pixelUrlMap.put("name", "超高清4K");
                 pixelUrlMap.put("maxPixelUrl", getUrlByPixle(Pixels.PIX_UHD_3840X2160));
