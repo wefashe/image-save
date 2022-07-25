@@ -46,7 +46,7 @@ public class MdFile extends File {
 
     public static void writeMdFile(Image image) throws IOException {
         // 获取README.md文件信息
-        MdFile readMeFile = new MdFile("必应每日壁纸", README_PATH);
+        MdFile readMeFile = new MdFile("最近壁纸展览", README_PATH);
         readMeFile.addImage(image);
         readMeFile.writeMdFile();
 
