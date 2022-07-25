@@ -71,25 +71,30 @@ public class MdFile extends File {
     public static void writeMdFiles(List<Image> images) throws IOException {
         Map<String, MdFile> monthFileMap = new HashMap<>();
         for (Image image : images) {
-            String imageDate = image.getDate();
-            if (monthFileMap.containsKey(imageDate)) {
+            LocalDate imageLocalDate = image.getLocalDate();
+            int year = imageLocalDate.getYear();
+            int month = imageLocalDate.getMonthValue();
+            String key = year + "-" + month;
+            MdFile mdFile = monthFileMap.get(key);
+            if (mdFile != null) {
+                mdFile.addImage(image);
                 continue;
             }
-            LocalDate imageLocalDate = image.getLocalDate();
+
             // 获取年份的文件夹，不存在则创建
-            Path path = IMAGES_PATH.resolve(String.valueOf(imageLocalDate.getYear()));
+            Path path = IMAGES_PATH.resolve(String.valueOf(year));
             if (!Files.exists(path)) {
                 Files.createDirectories(path);
             }
             // 获取月份的md文件，不存在则创建
-            path = path.resolve(String.format("%d-%02d.md", imageLocalDate.getYear(), imageLocalDate.getMonthValue()));
+            path = path.resolve(String.format("%d-%02d.md", year, month));
             if (!Files.exists(path)) {
                 Files.createFile(path);
             }
             // 获取月份的md文件信息
-            MdFile mdFile = new MdFile(String.format("必应%d年%02d月壁纸", imageLocalDate.getYear(), imageLocalDate.getMonthValue()), path);
+            mdFile = new MdFile(String.format("必应%d年%02d月壁纸", imageLocalDate.getYear(), imageLocalDate.getMonthValue()), path);
             mdFile.addImage(image);
-            monthFileMap.putIfAbsent(imageDate, mdFile);
+            monthFileMap.putIfAbsent(key, mdFile);
         }
 
         // 获取README.md文件信息
