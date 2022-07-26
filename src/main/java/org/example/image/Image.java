@@ -147,11 +147,10 @@ public class Image implements Comparable<Image> {
 
     public Map<String, String> getMaxPixelUrl() {
         String fullMaxPixelUrl = url.replaceAll("[^_]+.jpg", "UHD.jpg");
-        fullMaxPixelUrl = makeFullUrl(fullMaxPixelUrl);
         Map<String, String> pixelUrlMap = new HashMap<>();
         BufferedImage image = null;
         try {
-            URL imageURL = URI.create(fullMaxPixelUrl).toURL();
+            URL imageURL = URI.create(makeFullUrl(fullMaxPixelUrl)).toURL();
             image = ImageIO.read(imageURL);
             int width = image.getWidth();
             int height = image.getHeight();
