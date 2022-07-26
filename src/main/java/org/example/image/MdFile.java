@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public class MdFile extends File {
 
     private final static Path README_PATH = Paths.get("README.md");
-    private final static Path IMAGES_PATH = Paths.get("images/");
+    public final static Path IMAGES_PATH = Paths.get("images/");
 
     private final static int README_IMAGE_NUM = 30;
 

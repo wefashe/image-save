@@ -1,22 +1,127 @@
 package org.example.image;
 
+import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URLEncoder;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MySave {
     public static void main(String[] args) throws IOException {
-        // 保存今天壁纸
-        saveTodayImage2File();
-        // 按条件保存壁纸
-        // saveImages2File(0, 8);
-        // test();
+        if (args.length == 0) {
+            // 保存今天壁纸
+            saveTodayImage2File();
+            // 按条件保存壁纸
+            // saveImages2File(0, 8);
+            // test();
+        } else if (args.length == 2) {
+            download(args[0], args[1]);
+        }
+    }
+
+    private static void download(String start, String end) throws IOException {
+        LocalDate fromDate = LocalDate.parse(start.trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+        YearMonth fromYearMonth = YearMonth.of(fromDate.getYear(), fromDate.getMonthValue());
+        LocalDate toDate = LocalDate.parse(end.trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+        YearMonth toYearMonth = YearMonth.of(toDate.getYear(), toDate.getMonthValue());
+        List<MdFile> mdFiles = new ArrayList<>();
+        while (!fromYearMonth.isAfter(toYearMonth)) {
+            Path path = MdFile.IMAGES_PATH.resolve(String.valueOf(fromYearMonth.getYear()));
+            if (!Files.exists(path)) {
+                fromYearMonth = fromYearMonth.plusYears(1);
+                continue;
+            }
+            path = path.resolve(String.format("%d-%02d.md", fromYearMonth.getYear(), fromYearMonth.getMonthValue()));
+            if (Files.exists(path)) {
+                mdFiles.add(new MdFile(String.format("必应%d年%02d月壁纸", fromYearMonth.getYear(), fromYearMonth.getMonthValue()), path));
+            }
+            fromYearMonth = fromYearMonth.plusMonths(1);
+        }
+        List<Image> images = new ArrayList<>();
+        for (MdFile mdFile : mdFiles) {
+            List<Image> monthImages = mdFile.getImages();
+            for (Image image : monthImages) {
+                if (!fromDate.isAfter(image.getLocalDate()) && !toDate.isBefore(image.getLocalDate())) {
+                    images.add(image);
+                }
+            }
+        }
+        Path DOWN_PATH = Paths.get("downs/");
+        Files.walkFileTree(DOWN_PATH, new SimpleFileVisitor<Path>(){
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return super.visitFile(file, attrs);
+            }
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return super.postVisitDirectory(dir, exc);
+            }
+        });
+        List<String> fileNames = new ArrayList<>();
+        for (Image image : images) {
+            LocalDate localDate = image.getLocalDate();
+            // 获取年份的文件夹，不存在则创建
+            Path path = DOWN_PATH.resolve(String.valueOf(localDate.getYear()));
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            // 获取月份的md文件，不存在则创建
+            path = path.resolve(String.valueOf(localDate.getMonthValue()));
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            String name = String.format("%02d-%s", image.getLocalDate().getDayOfMonth(), image.getName());
+            path = path.resolve(name);
+            if (!Files.exists(path)) {
+                byte[] array = new byte[0];
+                try {
+                    array = IOUtils.toByteArray(URI.create(image.getFullMaxPixelUrl()));
+                } catch (IOException e) {
+                    fileNames.add(localDate.toString() + " " + image.getName());
+                    continue;
+                }
+                Files.createFile(path);
+                Files.write(path, array);
+            }
+        }
+        Path TEXT_PATH = DOWN_PATH.resolve("下载说明.txt");
+        Files.createFile(TEXT_PATH);
+        String text = "下载范围 " + fromDate.toString() + "  " + toDate;
+        Files.write(TEXT_PATH, text.getBytes(), StandardOpenOption.APPEND);
+        Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+        text = "下载总数 " + images.size() + ", 成功 " + (images.size() - fileNames.size()) + " , 失败 " + fileNames.size();
+        Files.write(TEXT_PATH, text.getBytes(), StandardOpenOption.APPEND);
+        Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+        Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+        text = "以下为失败列表：";
+        Files.write(TEXT_PATH, text.getBytes(), StandardOpenOption.APPEND);
+        Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+        String join = String.join(System.lineSeparator(), fileNames);
+        Files.write(TEXT_PATH, join.getBytes(), StandardOpenOption.APPEND);
+        Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+        text = "请进行单独下载！";
+        Files.write(TEXT_PATH, text.getBytes(), StandardOpenOption.APPEND);
+
     }
 
     /**
@@ -96,13 +201,13 @@ public class MySave {
                 desc = desc.replace("<", "");
                 desc = desc.replaceAll("\u00a0", " ").replaceAll(" +", " ");
                 if (!desc.contains(" (©")) {
-                    desc = desc.replace(" ©", " (©")+")";
+                    desc = desc.replace(" ©", " (©") + ")";
                 }
                 System.out.println(desc);
                 System.out.println(url);
                 String alt = url.substring(0, url.lastIndexOf("_"));
                 String link = "/search?q=%s&form=hpcapt&mkt=zh-cn&filters=HpDate:\"%s_1600\"";
-                String encodeToString = URLEncoder.encode(desc.substring(0, desc.indexOf(" ")),"UTF-8");
+                String encodeToString = URLEncoder.encode(desc.substring(0, desc.indexOf(" ")), "UTF-8");
                 link = String.format(link, encodeToString, date);
                 System.out.println(link);
                 System.out.println();

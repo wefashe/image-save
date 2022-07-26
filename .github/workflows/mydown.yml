@@ -1,0 +1,35 @@
+# This workflow will build a Java project with Maven
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: 手动任务-壁纸批量下载
+
+on:
+  workflow_dispatch:
+    inputs:
+      fromDate:
+        description: '下载起始时间'
+        required: true
+        default: ' '
+      toDate:
+        description: '下载结束时间'
+        required: true
+        default: ' '
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+      - name: Run Java Application
+        run: java -jar target/image-save-jar-with-dependencies.jar ${{ github.event.inputs.fromDate }} ${{ github.event.inputs.toDate }}
+        with:
+          github_token: ${{ secrets.MY_GIT_TOKEN }}
+          branch: main
