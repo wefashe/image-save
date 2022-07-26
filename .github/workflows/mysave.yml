@@ -1,15 +1,13 @@
 # This workflow will build a Java project with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: Java Image Save with Maven
+name: 早上2点定时保存壁纸
 
 on:
   schedule:
     # UTC时间与北京时间8小时时差
     # UTC时间 18点执行一次，即UTC+8北京时间 2点执行一次
     - cron:  '0 18 * * *'
-  push:
-    branches: [ main ]
 
 jobs:
   build:
@@ -29,10 +27,10 @@ jobs:
     - name: Commit files
       run: |
          git config --local user.email "wefashe@qq.com"
-         git config --local user.name "wefashe"
+         git config --local user.name "Java CI"
          git pull
          git add .
-         git commit -m "update readme.md"
+         git commit -m "$(git config user.name) Auto Save Wallpaper At `date +%Y-%m-%d\ %H:%M:%S`"
     - name: Push changes
       uses:  ad-m/github-push-action@master
       with:
