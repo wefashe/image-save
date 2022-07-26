@@ -65,18 +65,20 @@ public class MySave {
             }
         }
         Path DOWN_PATH = Paths.get("downs/");
-        Files.walkFileTree(DOWN_PATH, new SimpleFileVisitor<Path>(){
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return super.visitFile(file, attrs);
-            }
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-                return super.postVisitDirectory(dir, exc);
-            }
-        });
+        if (Files.exists(DOWN_PATH)) {
+            Files.walkFileTree(DOWN_PATH, new SimpleFileVisitor<Path>(){
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return super.visitFile(file, attrs);
+                }
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return super.postVisitDirectory(dir, exc);
+                }
+            });
+        }
         List<String> fileNames = new ArrayList<>();
         for (Image image : images) {
             LocalDate localDate = image.getLocalDate();
