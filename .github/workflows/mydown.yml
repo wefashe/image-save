@@ -9,11 +9,11 @@ on:
       fromDate:
         description: '下载起始时间'
         required: true
-        type: date
+        type: boolean
       toDate:
         description: '下载结束时间'
         required: true
-        type: date
+        type: boolean
 
 jobs:
   build:
