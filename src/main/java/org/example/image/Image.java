@@ -70,10 +70,7 @@ public class Image implements Comparable<Image> {
 
     public Image(String date, String url, String title, String desc, String alt, String link) {
         this.date = date;
-        if (url.contains("&")) {
-            url = url.substring(0, url.indexOf("&"));
-        }
-        this.url = url;
+        this.url = url.substring(0, url.lastIndexOf("_"));;
         this.title = escape(title);
         this.desc = escape(desc);
         this.alt = alt;
@@ -173,6 +170,17 @@ public class Image implements Comparable<Image> {
             }
         }
         return pixelUrlMap;
+    }
+
+    public String getFullMaxPixelUrl(){
+        if (maxPixelUrlMap.isEmpty()) {
+            maxPixelUrlMap = getMaxPixelUrl();
+        }
+        return makeFullUrl(maxPixelUrlMap.get("maxPixelUrl"));
+    }
+
+    public String getName(){
+        return url.substring(url.indexOf("id=") + 3) + ".jpg";
     }
 
     public String getTitle() {

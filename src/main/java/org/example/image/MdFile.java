@@ -233,6 +233,9 @@ public class MdFile extends File {
         }
     }
 
+    public List<Image> getImages() {
+        return images;
+    }
 
     @Override
     public boolean equals(Object obj) {
