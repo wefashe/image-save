@@ -33,7 +33,7 @@ jobs:
       - name: Upload Release # 发布到 Release
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: false # 因为之前已经创建了 Release，所以要进行更新
+          allowUpdates: true # 因为之前已经创建了 Release，所以要进行更新
           omitName: true # 更新的时候不改变 Release 的名字
           artifacts: 'downs.zip' # 多个文件逗号分开
           token: ${{ secrets.MY_GIT_TOKEN }} # https://github.com/settings/tokens 只选 repo 就行
