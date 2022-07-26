@@ -30,6 +30,3 @@ jobs:
         run: mvn -B package --file pom.xml
       - name: Run Java Application
         run: java -jar target/image-save-jar-with-dependencies.jar ${{ github.event.inputs.fromDate }} ${{ github.event.inputs.toDate }}
-        with:
-          github_token: ${{ secrets.MY_GIT_TOKEN }}
-          branch: main
