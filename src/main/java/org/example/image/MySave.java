@@ -1,6 +1,6 @@
 package org.example.image;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -24,11 +24,15 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class MySave {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length == 0) {
             // 保存今天壁纸
             saveTodayImage2File();
@@ -40,7 +44,7 @@ public class MySave {
         }
     }
 
-    private static void download(String start, String end) throws IOException {
+    private static void download(String start, String end) throws IOException, InterruptedException {
         LocalDate fromDate = LocalDate.parse(start.trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
         YearMonth fromYearMonth = YearMonth.of(fromDate.getYear(), fromDate.getMonthValue());
         LocalDate toDate = LocalDate.parse(end.trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -85,32 +89,38 @@ public class MySave {
         }
         if (images.size() > 0) {
             List<String> fileNames = new ArrayList<>();
-            for (Image image : images) {
-                LocalDate localDate = image.getLocalDate();
-                // 获取年份的文件夹，不存在则创建
-                Path path = DOWN_PATH.resolve(String.valueOf(localDate.getYear()));
-                if (!Files.exists(path)) {
-                    Files.createDirectories(path);
-                }
-                // 获取月份的md文件，不存在则创建
-                path = path.resolve(localDate.getYear() + "-" + localDate.getMonthValue());
-                if (!Files.exists(path)) {
-                    Files.createDirectories(path);
-                }
-                String name = String.format("%02d-%s", image.getLocalDate().getDayOfMonth(), image.getName());
-                path = path.resolve(name);
-                if (!Files.exists(path)) {
-                    byte[] array = new byte[0];
-                    try {
-                        array = IOUtils.toByteArray(URI.create(image.getFullMaxPixelUrl()));
-                    } catch (IOException e) {
-                        fileNames.add(localDate.toString() + " " + image.getName());
-                        continue;
+            int threadSize = Runtime.getRuntime().availableProcessors() * 2;
+            ExecutorService es = Executors.newFixedThreadPool(threadSize);
+            ArrayBlockingQueue<Image> queue = new ArrayBlockingQueue<>(images.size());
+            queue.addAll(images);
+
+            for (int i = 0; i < threadSize; i++) {
+                es.execute(() -> {
+                    while (!queue.isEmpty()) {
+                        Image image = null;
+                        String name = null;
+                        try {
+                            image = queue.poll(30, TimeUnit.MINUTES);
+                            LocalDate localDate = image.getLocalDate();
+                            // 获取年份的文件夹，不存在则创建
+                            Path path = DOWN_PATH.resolve(String.valueOf(localDate.getYear()));
+                            // 获取月份的md文件，不存在则创建
+                            path = path.resolve(localDate.getYear() + "-" + localDate.getMonthValue());
+                            name = String.format("%02d-%s", image.getLocalDate().getDayOfMonth(), image.getName());
+                            path = path.resolve(name);
+                            FileUtils.copyURLToFile(new URL(image.getFullMaxPixelUrl()),path.toFile());
+                        } catch (Exception e) {
+                            fileNames.add(image.getDate() + "    " + name);
+                        }
                     }
-                    Files.createFile(path);
-                    Files.write(path, array);
-                }
+                });
             }
+            // 执行子线程
+            es.shutdown();
+            while (!es.awaitTermination(100, TimeUnit.MINUTES)) {
+                System.out.println("状态：" + es.isShutdown() + "===============" + es.isTerminated());
+            }
+
             Path TEXT_PATH = DOWN_PATH.resolve("说明.txt");
             Files.createFile(TEXT_PATH);
             String text = "下载范围 " + fromDate.toString() + "  " + toDate;
