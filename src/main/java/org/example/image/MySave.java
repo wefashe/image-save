@@ -69,12 +69,13 @@ public class MySave {
         }
         Path DOWN_PATH = Paths.get("downs/");
         if (Files.exists(DOWN_PATH)) {
-            Files.walkFileTree(DOWN_PATH, new SimpleFileVisitor<Path>(){
+            Files.walkFileTree(DOWN_PATH, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     Files.delete(file);
                     return super.visitFile(file, attrs);
                 }
+
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                     Files.delete(dir);
@@ -117,17 +118,18 @@ public class MySave {
             Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
             text = "下载总数 " + images.size() + ", 成功 " + (images.size() - fileNames.size()) + " , 失败 " + fileNames.size();
             Files.write(TEXT_PATH, text.getBytes(), StandardOpenOption.APPEND);
-            Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
-            Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
-            text = "以下为失败列表：";
-            Files.write(TEXT_PATH, text.getBytes(), StandardOpenOption.APPEND);
-            Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
-            String join = String.join(System.lineSeparator(), fileNames);
-            Files.write(TEXT_PATH, join.getBytes(), StandardOpenOption.APPEND);
-            Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
-            text = "请进行单独下载！";
-            Files.write(TEXT_PATH, text.getBytes(), StandardOpenOption.APPEND);
-
+            if (fileNames.size() != 0) {
+                Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+                Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+                text = "以下为失败列表：";
+                Files.write(TEXT_PATH, text.getBytes(), StandardOpenOption.APPEND);
+                Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+                String join = String.join(System.lineSeparator(), fileNames);
+                Files.write(TEXT_PATH, join.getBytes(), StandardOpenOption.APPEND);
+                Files.write(TEXT_PATH, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+                text = "请进行单独下载！";
+                Files.write(TEXT_PATH, text.getBytes(), StandardOpenOption.APPEND);
+            }
 
             //压缩结果输出，即压缩包
             FileOutputStream fos = new FileOutputStream("down.zip");
@@ -139,12 +141,13 @@ public class MySave {
             zipOut.close();
             fos.close();
 
-            Files.walkFileTree(DOWN_PATH, new SimpleFileVisitor<Path>(){
+            Files.walkFileTree(DOWN_PATH, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     Files.delete(file);
                     return super.visitFile(file, attrs);
                 }
+
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                     Files.delete(dir);
@@ -159,9 +162,10 @@ public class MySave {
 
     /**
      * 将fileToZip文件夹及其子目录文件递归压缩到zip文件中
+     *
      * @param fileToZip 递归当前处理对象，可能是文件夹，也可能是文件
-     * @param fileName fileToZip文件或文件夹名称
-     * @param zipOut 压缩文件输出流
+     * @param fileName  fileToZip文件或文件夹名称
+     * @param zipOut    压缩文件输出流
      * @throws IOException
      */
     private static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
