@@ -130,9 +130,12 @@ public class MySave {
                 text = "请进行单独下载！";
                 Files.write(TEXT_PATH, text.getBytes(), StandardOpenOption.APPEND);
             }
-
+            File file = new File("images.zip");
+            if (file.exists()) {
+                file.delete();
+            }
             //压缩结果输出，即压缩包
-            FileOutputStream fos = new FileOutputStream("images.zip");
+            FileOutputStream fos = new FileOutputStream(file);
             ZipOutputStream zipOut = new ZipOutputStream(fos);
             File fileToZip = new File(DOWN_PATH.toString());
             //递归压缩文件夹
