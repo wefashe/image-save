@@ -37,6 +37,6 @@ jobs:
           repo_token: "${{ secrets.MY_GIT_TOKEN }}"
           automatic_release_tag: "down_zip_tag"
           prerelease: false
-          title: "批量壁纸下载(${{github.event.inputs.fromDate}} ～ ${{github.event.inputs.toDate}})"
+          title: "(${{github.event.inputs.fromDate}}至${{github.event.inputs.toDate}})下载成功！"
           files: |
             *.zip
