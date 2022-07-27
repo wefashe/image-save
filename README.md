@@ -25,5 +25,5 @@
 
 
 ### 批量壁纸下载
-1. 先去[任务页面](https://github.com/wefashe/image-save/actions/workflows/mydown.yml)，选好下载的起始时间，执行批量下载任务
-2. 稍等一会儿，等下载任务执行完毕后，再去[结果页面](https://github.com/wefashe/image-save/releases/tag/down_zip_tag)获取
+先去[任务页面](https://github.com/wefashe/image-save/actions/workflows/mydown.yml)，点击`Run workflow`，输入下载的起始时间，点击<kbd>Run workflow</kbd>按钮执行批量下载任务，等待任务执行完毕，  
+来到[结果页面](https://github.com/wefashe/image-save/releases/tag/down_zip_tag)查看标题是否包含输入的下载起始日期，包含则说明下载成功，可以直接下载下面文件名中包含images的压缩包  
