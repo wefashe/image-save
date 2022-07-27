@@ -70,7 +70,10 @@ public class Image implements Comparable<Image> {
 
     public Image(String date, String url, String title, String desc, String alt, String link) {
         this.date = date;
-        this.url = url.substring(0, url.lastIndexOf("_"));;
+        if (url.contains("&")) {
+            url = url.substring(0, url.indexOf("&"));
+        }
+        this.url = url;
         this.title = escape(title);
         this.desc = escape(desc);
         this.alt = alt;
