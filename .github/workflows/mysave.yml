@@ -30,7 +30,7 @@ jobs:
          git config --local user.name "Java CI"
          git pull
          git add .
-         git commit -m "$(git config user.name) Auto Save Wallpaper At `date +%Y-%m-%d\ %H:%M:%S`"
+         git commit -m "$(git config user.name) Auto Save Wallpaper At `TZ=UTC-8 date +%Y-%m-%d\ %H:%M:%S`"
     - name: Push changes
       uses:  ad-m/github-push-action@master
       with:
