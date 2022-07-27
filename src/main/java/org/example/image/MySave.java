@@ -118,7 +118,7 @@ public class MySave {
             // 执行子线程
             es.shutdown();
             while (!es.awaitTermination(100, TimeUnit.MINUTES)) {
-                System.out.println("状态：" + es.isShutdown() + "===============" + es.isTerminated());
+                es.shutdownNow();
             }
 
             Path TEXT_PATH = DOWN_PATH.resolve("说明.txt");
