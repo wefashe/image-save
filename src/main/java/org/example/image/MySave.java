@@ -67,7 +67,7 @@ public class MySave {
                 }
             }
         }
-        Path DOWN_PATH = Paths.get("downs/");
+        Path DOWN_PATH = Paths.get("target/images");
         if (Files.exists(DOWN_PATH)) {
             Files.walkFileTree(DOWN_PATH, new SimpleFileVisitor<Path>() {
                 @Override
@@ -93,7 +93,7 @@ public class MySave {
                     Files.createDirectories(path);
                 }
                 // 获取月份的md文件，不存在则创建
-                path = path.resolve(String.valueOf(localDate.getMonthValue()));
+                path = path.resolve(localDate.getYear() + "-" + localDate.getMonthValue());
                 if (!Files.exists(path)) {
                     Files.createDirectories(path);
                 }
@@ -111,7 +111,7 @@ public class MySave {
                     Files.write(path, array);
                 }
             }
-            Path TEXT_PATH = DOWN_PATH.resolve("下载说明.txt");
+            Path TEXT_PATH = DOWN_PATH.resolve("说明.txt");
             Files.createFile(TEXT_PATH);
             String text = "下载范围 " + fromDate.toString() + "  " + toDate;
             Files.write(TEXT_PATH, text.getBytes(), StandardOpenOption.APPEND);
@@ -132,7 +132,7 @@ public class MySave {
             }
 
             //压缩结果输出，即压缩包
-            FileOutputStream fos = new FileOutputStream("down.zip");
+            FileOutputStream fos = new FileOutputStream("images.zip");
             ZipOutputStream zipOut = new ZipOutputStream(fos);
             File fileToZip = new File(DOWN_PATH.toString());
             //递归压缩文件夹
