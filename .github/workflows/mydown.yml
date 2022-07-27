@@ -22,8 +22,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      # 设置服务器时区为东八区
+      - name: Set time zone
+        run: sudo timedatectl set-timezone 'Asia/Shanghai'
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
@@ -37,6 +38,6 @@ jobs:
           repo_token: "${{ secrets.MY_GIT_TOKEN }}"
           automatic_release_tag: "down_zip_tag"
           prerelease: false
-          title: "(${{github.event.inputs.fromDate}}至${{github.event.inputs.toDate}})下载成功！"
+          title: "${{github.event.inputs.fromDate}}至${{github.event.inputs.toDate}}下载成功！"
           files: |
             *.zip

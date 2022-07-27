@@ -17,6 +17,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      # 设置服务器时区为东八区
+    - name: Set time zone
+      run: sudo timedatectl set-timezone 'Asia/Shanghai'
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
       with:
