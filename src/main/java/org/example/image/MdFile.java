@@ -35,7 +35,7 @@ public class MdFile extends File {
 
     public MdFile(String title, Path path, List<Image> images) throws IOException {
         super(path.toString());
-        this.title = "## " + title;
+        this.title = "### " + title;
         this.path = path;
         if (!Files.exists(path)) {
             Files.createFile(path);
@@ -215,7 +215,20 @@ public class MdFile extends File {
                 join = join.replace("-01.md) | ", "-01.md)  " + System.lineSeparator());
                 Files.write(path, join.getBytes(), StandardOpenOption.APPEND);
             }
-
+            if (images.size() != 0) {
+                // 批量下载 README.md
+                Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+                Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+                Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+                Files.write(path, "### 批量壁纸下载".getBytes(), StandardOpenOption.APPEND);
+                Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+                String text = "1. 先去[任务页面](https://github.com/wefashe/image-save/actions/workflows/mydown.yml)，选好下载的起始时间，执行批量下载任务";
+                Files.write(path, text.getBytes(), StandardOpenOption.APPEND);
+                Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+                text = "2. 稍等一会儿，等下载任务执行完毕后，再去[结果页面](https://github.com/wefashe/image-save/releases/tag/down_zip_tag)获取";
+                Files.write(path, text.getBytes(), StandardOpenOption.APPEND);
+                Files.write(path, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-## 最近壁纸展示
+### 最近壁纸展示
 ||
 |:---:|
 |[![https://cn.bing.com/th?id=OHR.NabateanTomb_ZH-CN5770360385&w=1204&h=677](https://cn.bing.com/th?id=OHR.NabateanTomb_ZH-CN5770360385_1366x768.jpg&w=1204&h=677 "孤独的城堡&#10;玛甸沙勒（也被称为黑格拉）的纳巴泰墓，沙特阿拉伯&#10;© Tuul & Bruno Morandi/Getty Images")](https://cn.bing.com/search?q=%e7%8e%9b%e7%94%b8%e6%b2%99%e5%8b%92&form=hpcapt&mkt=zh-cn&filters=HpDate:"20220726_1600")<br/><center><sup>**新**</sup>&nbsp;孤独的城堡，玛甸沙勒（也被称为黑格拉）的纳巴泰墓，沙特阿拉伯<center/>|
@@ -22,3 +22,8 @@
 [2021-12](images/2021/2021-12.md) | [2021-11](images/2021/2021-11.md) | [2021-10](images/2021/2021-10.md) | [2021-09](images/2021/2021-09.md) | [2021-08](images/2021/2021-08.md) | [2021-07](images/2021/2021-07.md) | [2021-06](images/2021/2021-06.md) | [2021-05](images/2021/2021-05.md) | [2021-04](images/2021/2021-04.md) | [2021-03](images/2021/2021-03.md) | [2021-02](images/2021/2021-02.md) | [2021-01](images/2021/2021-01.md)  
 [2020-12](images/2020/2020-12.md) | [2020-11](images/2020/2020-11.md) | [2020-10](images/2020/2020-10.md) | [2020-09](images/2020/2020-09.md) | [2020-08](images/2020/2020-08.md) | [2020-07](images/2020/2020-07.md) | [2020-06](images/2020/2020-06.md) | [2020-05](images/2020/2020-05.md) | [2020-04](images/2020/2020-04.md) | [2020-03](images/2020/2020-03.md) | [2020-02](images/2020/2020-02.md) | [2020-01](images/2020/2020-01.md)  
 [2019-12](images/2019/2019-12.md) | [2019-11](images/2019/2019-11.md) | [2019-10](images/2019/2019-10.md) | [2019-09](images/2019/2019-09.md) | [2019-08](images/2019/2019-08.md) | [2019-07](images/2019/2019-07.md) | [2019-06](images/2019/2019-06.md) | [2019-05](images/2019/2019-05.md) | [2019-04](images/2019/2019-04.md) | [2019-03](images/2019/2019-03.md)
+
+
+### 批量壁纸下载
+1. 先去[任务页面](https://github.com/wefashe/image-save/actions/workflows/mydown.yml)，选好下载的起始时间，执行批量下载任务
+2. 稍等一会儿，等下载任务执行完毕后，再去[结果页面](https://github.com/wefashe/image-save/releases/tag/down_zip_tag)获取
