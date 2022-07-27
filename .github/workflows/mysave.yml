@@ -8,6 +8,7 @@ on:
     # UTC时间与北京时间8小时时差
     # UTC时间 18点执行一次，即UTC+8北京时间 2点执行一次
     - cron:  '0 18 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
