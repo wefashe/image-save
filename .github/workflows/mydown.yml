@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
     inputs:
       fromDate:
-        description: '下载起始时间'
+        description: '下载起始时间 (注意：格式为20220101)'
         required: true
         default: ' '
       toDate:
-        description: '下载结束时间'
+        description: '下载结束时间 (注意：格式为20220101)'
         required: true
         default: ' '
 
