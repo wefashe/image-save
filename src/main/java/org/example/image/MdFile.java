@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public class MdFile extends File {
 
     private final static Path README_PATH = Paths.get("README.md");
-    public final static Path IMAGES_PATH = Paths.get("images/");
+    public final static Path IMAGES_PATH = Paths.get("images");
 
     private final static int README_IMAGE_NUM = 30;
 
@@ -49,20 +49,18 @@ public class MdFile extends File {
         MdFile readMeFile = new MdFile("最近壁纸展示", README_PATH);
         readMeFile.addImage(image);
         readMeFile.writeMdFile();
-
         LocalDate imageLocalDate = image.getLocalDate();
-        // 获取年份的文件夹，不存在则创建
-        Path path = IMAGES_PATH.resolve(String.valueOf(imageLocalDate.getYear()));
-        if (!Files.exists(path)) {
-            Files.createDirectories(path);
+        String year = String.valueOf(imageLocalDate.getYear());
+        String fileName = String.format("%d-%02d.md", imageLocalDate.getYear(), imageLocalDate.getMonthValue());
+        Path path = IMAGES_PATH.resolve(year).resolve(fileName);
+        if (!Files.exists(path.getParent())) {
+            Files.createDirectories(path.getParent());
         }
-        // 获取月份的md文件，不存在则创建
-        path = path.resolve(String.format("%d-%02d.md", imageLocalDate.getYear(), imageLocalDate.getMonthValue()));
         if (!Files.exists(path)) {
             Files.createFile(path);
         }
-        // 获取月份的md文件信息
-        MdFile mdFile = new MdFile(String.format("必应%d年%02d月壁纸", imageLocalDate.getYear(), imageLocalDate.getMonthValue()), path);
+        String title = String.format("必应%d年%02d月壁纸", imageLocalDate.getYear(), imageLocalDate.getMonthValue());
+        MdFile mdFile = new MdFile(title, path);
         mdFile.addImage(image);
         mdFile.writeMdFile();
     }
