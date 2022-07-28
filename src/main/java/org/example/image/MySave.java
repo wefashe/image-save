@@ -32,7 +32,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class MySave {
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             // 保存今天壁纸
             saveTodayImage2File();
@@ -44,7 +44,7 @@ public class MySave {
         }
     }
 
-    private static void download(String start, String end) throws IOException, InterruptedException {
+    private static void download(String start, String end) throws IOException {
         LocalDate fromDate = LocalDate.parse(start.trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
         YearMonth fromYearMonth = YearMonth.of(fromDate.getYear(), fromDate.getMonthValue());
         LocalDate toDate = LocalDate.parse(end.trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -89,7 +89,7 @@ public class MySave {
         }
         if (images.size() > 0) {
             List<String> fileNames = new ArrayList<>();
-            int threadSize = Runtime.getRuntime().availableProcessors() * 2;
+            int threadSize = Math.min(images.size(), Runtime.getRuntime().availableProcessors() * 2);
             ExecutorService es = Executors.newFixedThreadPool(threadSize);
             ArrayBlockingQueue<Image> queue = new ArrayBlockingQueue<>(images.size());
             queue.addAll(images);
@@ -108,7 +108,7 @@ public class MySave {
                             path = path.resolve(localDate.getYear() + "-" + localDate.getMonthValue());
                             name = String.format("%02d-%s", image.getLocalDate().getDayOfMonth(), image.getName());
                             path = path.resolve(name);
-                            FileUtils.copyURLToFile(new URL(image.getFullMaxPixelUrl()),path.toFile());
+                            FileUtils.copyURLToFile(new URL(image.getFullMaxPixelUrl()), path.toFile());
                         } catch (Exception e) {
                             fileNames.add(image.getDate() + "    " + name);
                         }
@@ -117,10 +117,14 @@ public class MySave {
             }
             // 执行子线程
             es.shutdown();
-            while (!es.awaitTermination(100, TimeUnit.MINUTES)) {
+            try {
+                while (!es.awaitTermination(100, TimeUnit.MINUTES)) {
+                    // 超时的时候向线程池中所有的线程发出中断
+                    es.shutdownNow();
+                }
+            } catch (InterruptedException e) {
                 es.shutdownNow();
             }
-
             Path TEXT_PATH = DOWN_PATH.resolve("说明.txt");
             Files.createFile(TEXT_PATH);
             String text = "下载范围 " + fromDate.toString() + "  " + toDate;
