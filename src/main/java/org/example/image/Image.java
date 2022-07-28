@@ -183,7 +183,7 @@ public class Image implements Comparable<Image> {
     }
 
     public String getName(){
-        return url.substring(url.indexOf("id=") + 3) + ".jpg";
+        return url.substring(url.indexOf("id=") + 3, url.lastIndexOf("_")) + ".jpg";
     }
 
     public String getTitle() {

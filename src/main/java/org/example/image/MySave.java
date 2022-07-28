@@ -71,7 +71,7 @@ public class MySave {
                 }
             }
         }
-        Path DOWN_PATH = Paths.get("target/images");
+        Path DOWN_PATH = Paths.get("target").resolve("images");
         if (Files.exists(DOWN_PATH)) {
             Files.walkFileTree(DOWN_PATH, new SimpleFileVisitor<Path>() {
                 @Override
@@ -87,6 +87,7 @@ public class MySave {
                 }
             });
         }
+        Files.createDirectories(DOWN_PATH);
         if (images.size() > 0) {
             List<String> fileNames = new ArrayList<>();
             int threadSize = Math.min(images.size(), Runtime.getRuntime().availableProcessors() * 2);
