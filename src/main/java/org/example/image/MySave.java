@@ -90,7 +90,7 @@ public class MySave {
         Files.createDirectories(DOWN_PATH);
         if (images.size() > 0) {
             List<String> fileNames = new ArrayList<>();
-            int threadSize = Math.min(images.size(), Runtime.getRuntime().availableProcessors() * 2);
+            int threadSize = Math.min(images.size(), Runtime.getRuntime().availableProcessors() * 2 + 1);
             ExecutorService es = Executors.newFixedThreadPool(threadSize);
             ArrayBlockingQueue<Image> queue = new ArrayBlockingQueue<>(images.size());
             queue.addAll(images);
