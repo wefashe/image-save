@@ -28,13 +28,18 @@ jobs:
       run: mvn -B package --file pom.xml
     - name: Run Java Application
       run: java -jar target/image-save-jar-with-dependencies.jar
+    - name: Clear target
+      run: rm -rf target/
     - name: Commit files
       run: |
          git config --local user.email "wefashe@qq.com"
          git config --local user.name "Java CI"
-         git pull
          git add .
          git commit -m "$(git config user.name) Auto Save Wallpaper At `TZ=UTC-8 date +%Y-%m-%d\ %H:%M:%S`"
+      continue-on-error: true
+    - name: Check on failures
+      if: steps.commit.outputs.status == 'failure'
+      run: exit 1
     - name: Push changes
       uses:  ad-m/github-push-action@master
       with:
