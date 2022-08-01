@@ -45,10 +45,6 @@ public class MdFile extends File {
     }
 
     public static void writeMdFile(Image image) throws IOException {
-        // 获取README.md文件信息
-        MdFile readMeFile = new MdFile("最近壁纸展示", README_PATH);
-        readMeFile.addImage(image);
-        readMeFile.writeMdFile();
         LocalDate imageLocalDate = image.getLocalDate();
         String year = String.valueOf(imageLocalDate.getYear());
         String fileName = String.format("%d-%02d.md", imageLocalDate.getYear(), imageLocalDate.getMonthValue());
@@ -63,6 +59,10 @@ public class MdFile extends File {
         MdFile mdFile = new MdFile(title, path);
         mdFile.addImage(image);
         mdFile.writeMdFile();
+        // 获取README.md文件信息
+        MdFile readMeFile = new MdFile("最近壁纸展示", README_PATH);
+        readMeFile.addImage(image);
+        readMeFile.writeMdFile();
     }
 
     public static void writeMdFiles(List<Image> images) throws IOException {
@@ -93,15 +93,13 @@ public class MdFile extends File {
             mdFile.addImage(image);
             monthFileMap.putIfAbsent(key, mdFile);
         }
-
+        for (MdFile mdFile : monthFileMap.values().stream().collect(Collectors.toList())) {
+            mdFile.writeMdFile();
+        }
         // 获取README.md文件信息
         MdFile readMeFile = new MdFile("最近壁纸展示", README_PATH);
         readMeFile.addImages(images);
         readMeFile.writeMdFile();
-
-        for (MdFile mdFile : monthFileMap.values().stream().collect(Collectors.toList())) {
-            mdFile.writeMdFile();
-        }
     }
 
     private void readMdFile() throws IOException {
