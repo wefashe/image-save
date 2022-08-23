@@ -4,6 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.IOUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.safety.Whitelist;
+import org.jsoup.select.Elements;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -263,7 +268,7 @@ public class Image implements Comparable<Image> {
         return this.date + this.title + System.lineSeparator() + this.url + System.lineSeparator() + this.getDesc();
     }
 
-    public static Image getImageByJson(JSONObject obj) {
+    public static Image getImageByJson(JSONObject obj) throws IOException {
         String date = (String) obj.get("enddate");
         String url = (String) obj.get("url");
         String title = (String) obj.get("title");
@@ -273,6 +278,14 @@ public class Image implements Comparable<Image> {
         String fullstartdate = (String) obj.get("fullstartdate");
         String hpDate = fullstartdate.substring(0, 8) + "_" + fullstartdate.substring(8);
         String link = copyrightlink + "&filters=HpDate:\"" + hpDate + "\"";
+        if (false) {
+            // 图片故事
+            link = makeFullUrl(link);
+            Element body = Jsoup.connect(link).get().body();
+            Elements select = body.select("#encycloCanvas .tc_content .ency_desc");
+            String text = Jsoup.clean(select.html(), "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+            System.out.println(text);
+        }
         return new Image(date, url, title, desc, alt, link);
     }
 
