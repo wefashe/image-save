@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.IOUtils;
+import org.example.db.H2Db;
+import org.example.db.Wallpaper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,6 +19,9 @@ import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -269,6 +274,18 @@ public class Image implements Comparable<Image> {
     }
 
     public static Image getImageByJson(JSONObject obj) throws IOException {
+        Wallpaper wallpaper = new Wallpaper(obj);
+        wallpaper.addDesc(Image.BING_URL);
+        Connection connection = H2Db.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            statement.execute("delete from wallpaper where hsh = '" + wallpaper.getHsh() + "'");
+            statement.execute(wallpaper.toSql());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
         String date = (String) obj.get("enddate");
         String url = (String) obj.get("url");
         String title = (String) obj.get("title");
@@ -278,14 +295,6 @@ public class Image implements Comparable<Image> {
         String fullstartdate = (String) obj.get("fullstartdate");
         String hpDate = fullstartdate.substring(0, 8) + "_" + fullstartdate.substring(8);
         String link = copyrightlink + "&filters=HpDate:\"" + hpDate + "\"";
-        if (false) {
-            // 图片故事
-            link = makeFullUrl(link);
-            Element body = Jsoup.connect(link).get().body();
-            Elements select = body.select("#encycloCanvas .tc_content .ency_desc");
-            String text = Jsoup.clean(select.html(), "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
-            System.out.println(text);
-        }
         return new Image(date, url, title, desc, alt, link);
     }
 

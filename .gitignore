@@ -2,3 +2,5 @@
 .idea
 /downs/
 *.zip
+/db/*.lock.db
+/db/*.trace.db
