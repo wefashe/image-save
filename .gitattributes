@@ -1,1 +1,1 @@
-db/images.mv.db binary diff=git diff –cached –binary
+db/images.mv.db binary -diff
