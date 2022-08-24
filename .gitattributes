@@ -1,0 +1,2 @@
+* text eol=lf // 非特殊标示的都识别成文本文件，行结束符为lf
+db/images.mv.db binary
