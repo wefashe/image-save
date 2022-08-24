@@ -16,10 +16,6 @@ import java.sql.Statement;
 import java.util.Objects;
 
 public class H2Test {
-    private static final String USER = "wefashe";
-    private static final String PASSWORD = "wefashe";
-    private static final String DRIVER_CLASS = "org.h2.Driver";
-    private static final String JDBC_URL = "jdbc:h2:./db/images;AUTO_SERVER=TRUE";
 
     public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
         Connection conn = H2Db.getConnection();

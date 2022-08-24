@@ -10,6 +10,7 @@ public class H2Db {
     private static final String USER = "bing";
     private static final String PASSWORD = "wallpaper";
     private static final String DRIVER_CLASS = "org.h2.Driver";
+    // 嵌入式 只允许有一个客户端连接到H2数据库 服务器模式可以同时多个客户端，但需要单独启动数据库服务
     private static final String JDBC_URL = "jdbc:h2:./db/images;AUTO_SERVER=TRUE";
 
     private static Connection conn;
@@ -30,7 +31,7 @@ public class H2Db {
         try {
             conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
         } catch (SQLException e) {
-            System.err.println("获取h2数据库连接失败！");
+            System.err.println("获取h2数据库连接失败！" + e.getMessage());
         }
         return conn;
     }

@@ -9,24 +9,9 @@ import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-/*
-drop table wallpaper;
-create table wallpaper
-(
-    startdate     VARCHAR(8) NOT NULL,
-    fullstartdate VARCHAR(50) NOT NULL,
-    enddate       VARCHAR(8) NOT NULL,
-    url           VARCHAR(150) NOT NULL,
-    urlbase       VARCHAR(100) NOT NULL,
-    copyright     VARCHAR(100) NOT NULL,
-    copyrightlink VARCHAR(150) NOT NULL,
-    title         VARCHAR(50) NOT NULL,
-    quiz          VARCHAR(150) NOT NULL,
-    hsh           VARCHAR(50) NOT NULL,
-    desc          text NOT NULL,
-    PRIMARY KEY (hsh)
-);
- */
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 public class Wallpaper {
 
     private String startdate;
@@ -40,6 +25,7 @@ public class Wallpaper {
     private String quiz;
     private String hsh;
     private String desc;
+    private String createtime;
 
     public Wallpaper(JSONObject obj) {
         this.startdate = (String) obj.get("startdate");
@@ -52,6 +38,9 @@ public class Wallpaper {
         this.title = (String) obj.get("title");
         this.quiz = (String) obj.get("quiz");
         this.hsh = (String) obj.get("hsh");
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC+8"));
+        DateTimeFormatter fmt24 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.createtime = now.format(fmt24);
     }
 
     public void addDesc(String prefix) {
@@ -156,9 +145,9 @@ public class Wallpaper {
     }
 
     public String toSql(){
-        String sql = "insert into wallpaper(startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh,desc)"
-                     + "values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')";
+        String sql = "insert into wallpaper(startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh,desc,createtime)"
+                     + "values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')";
         return String.format(sql, this.startdate, this.fullstartdate, this.enddate, this.url, this.urlbase,
-                this.copyright, this.copyrightlink, this.title, this.quiz, this.hsh, this.desc);
+                this.copyright, this.copyrightlink, this.title, this.quiz, this.hsh, this.desc,this.createtime);
     }
 }
