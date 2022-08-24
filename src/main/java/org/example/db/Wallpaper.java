@@ -144,10 +144,11 @@ public class Wallpaper {
         this.desc = desc;
     }
 
-    public String toSql(){
-        String sql = "insert into wallpaper(startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh,desc,createtime)"
-                     + "values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')";
-        return String.format(sql, this.startdate, this.fullstartdate, this.enddate, this.url, this.urlbase,
-                this.copyright, this.copyrightlink, this.title, this.quiz, this.hsh, this.desc,this.createtime);
+    public String getCreatetime() {
+        return createtime;
+    }
+
+    public void setCreatetime(String createtime) {
+        this.createtime = createtime;
     }
 }

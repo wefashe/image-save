@@ -6,11 +6,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.example.db.H2Db;
 import org.example.db.Wallpaper;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.safety.Whitelist;
-import org.jsoup.select.Elements;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -19,9 +14,6 @@ import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -273,18 +265,10 @@ public class Image implements Comparable<Image> {
         return this.date + this.title + System.lineSeparator() + this.url + System.lineSeparator() + this.getDesc();
     }
 
-    public static Image getImageByJson(JSONObject obj) throws IOException {
+    public static Image getImageByJson(JSONObject obj) {
         Wallpaper wallpaper = new Wallpaper(obj);
         wallpaper.addDesc(Image.BING_URL);
-        Connection connection = H2Db.getConnection();
-        try {
-            Statement statement = connection.createStatement();
-            statement.execute("delete from wallpaper where hsh = '" + wallpaper.getHsh() + "'");
-            statement.execute(wallpaper.toSql());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
+        H2Db.addWallpaper(wallpaper);
 
         String date = (String) obj.get("enddate");
         String url = (String) obj.get("url");

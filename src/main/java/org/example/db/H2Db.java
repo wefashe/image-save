@@ -13,27 +13,70 @@ public class H2Db {
     // 嵌入式 只允许有一个客户端连接到H2数据库 服务器模式可以同时多个客户端，但需要单独启动数据库服务
     private static final String JDBC_URL = "jdbc:h2:./db/images;AUTO_SERVER=TRUE";
 
-    private static Connection conn;
-
+    private static Connection connection;
+    private static Statement statement;
 
     static {
         try {
             Class.forName(DRIVER_CLASS);
         } catch (ClassNotFoundException e) {
-            System.err.println("h2数据库驱动类找不到！");
+            System.err.println("h2数据库驱动类找不到！" + e.getMessage());
         }
     }
 
     public static Connection getConnection() {
-        if (conn != null) {
-            return conn;
+        if (connection != null) {
+            return connection;
         }
         try {
-            conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+            connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
         } catch (SQLException e) {
             System.err.println("获取h2数据库连接失败！" + e.getMessage());
         }
-        return conn;
+        return connection;
+    }
+
+    public static Statement getStatement() {
+        if (statement != null) {
+            return statement;
+        }
+        Connection conn = getConnection();
+        try {
+            statement = conn.createStatement();
+        } catch (SQLException e) {
+            System.err.println("获取h2数据库Statement对象失败！" + e.getMessage());
+        }
+        return statement;
+    }
+
+    public static boolean delete(String hsh){
+        Statement session = getStatement();
+        boolean res = false;
+        try {
+            res = session.execute("delete from wallpaper where hsh = '" + hsh + "'");
+        } catch (SQLException e) {
+            System.err.println("刪除"+hsh+"数据失败！" + e.getMessage());
+        }
+        // close(session, connection);
+        return res;
+    }
+
+    public static boolean addWallpaper(Wallpaper wallpaper) {
+        delete(wallpaper.getHsh());
+        Statement session = getStatement();
+        String sql = "insert into wallpaper(startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh,desc,createtime)"
+                     + "values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')";
+        sql = String.format(sql, wallpaper.getStartdate(), wallpaper.getFullstartdate(), wallpaper.getEnddate(),
+                wallpaper.getUrl(), wallpaper.getUrlbase(), wallpaper.getCopyright(), wallpaper.getCopyrightlink(),
+                wallpaper.getTitle(), wallpaper.getQuiz(), wallpaper.getHsh(), wallpaper.getDesc(), wallpaper.getCreatetime());
+        boolean res = false;
+        try {
+            res = session.execute(sql);
+        } catch (SQLException e) {
+            System.err.println("新增" + wallpaper.getHsh() + "数据失败！" + e.getMessage());
+        }
+        // close(session, connection);
+        return res;
     }
 
     //释放资源
