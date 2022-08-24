@@ -1,2 +1,1 @@
-* text eol=lf
-db/images.mv.db binary
+db/images.mv.db binary diff=git diff –cached –binary
