@@ -24,7 +24,7 @@ public class H2Test {
     public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
         Connection conn = H2Db.getConnection();
         Statement statement = conn.createStatement();
-        String bingImageApi = Image.getBingImageApi(0, 10);
+        String bingImageApi = Image.getBingImageApi(10, 10);
         String jsonText = IOUtils.toString(URI.create(bingImageApi), StandardCharsets.UTF_8);
         JSONArray array = JSON.parseObject(jsonText).getJSONArray("images");
         if (Objects.isNull(array) || array.isEmpty()) {
@@ -33,6 +33,7 @@ public class H2Test {
         for (JSONObject obj : array.toArray(new JSONObject[0])) {
             Wallpaper wallpaper = new Wallpaper(obj);
             wallpaper.addDesc(Image.BING_URL);
+            statement.execute("delete from wallpaper where hsh = '" + wallpaper.getHsh() + "'");
             statement.execute(wallpaper.toSql());
         }
         H2Db.close(statement, conn);
