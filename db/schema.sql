@@ -11,5 +11,6 @@ create table wallpaper
     quiz          VARCHAR(150) NOT NULL,
     hsh           VARCHAR(50) NOT NULL comment '壁纸HASH值',
     desc          text NOT NULL,
+    createtime    VARCHAR(20) NOT NULL,
     PRIMARY KEY (hsh)
 );
