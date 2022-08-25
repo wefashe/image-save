@@ -103,9 +103,12 @@ public class H2Db {
         return ret;
     }
 
-    public List<Wallpaper> getWallpapers(String date) {
-        String sql = "select * from wallpaper where enddate like '" + date
-                     + "%'order by enddate desc";
+    public static List<Wallpaper> getWallpapers(String date) {
+        String sql = "select * from wallpaper";
+        if (date != null && date.trim().length() != 0) {
+            sql += " where enddate like '" + date + "%'";
+        }
+        sql += " order by enddate desc";
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
@@ -114,7 +117,7 @@ public class H2Db {
             connection = getConnection();
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
-            if (resultSet.next()) {
+            while (resultSet.next()) {
                 Wallpaper wallpaper = getWallpaper(resultSet);
                 wallpapers.add(wallpaper);
             }
@@ -126,7 +129,7 @@ public class H2Db {
         return wallpapers;
     }
 
-    public Wallpaper getWallpaper(String date) {
+    public static Wallpaper getWallpaper(String date) {
         String sql = "select * from wallpaper where enddate = '" + date + "'";
         Connection connection = null;
         Statement statement = null;
@@ -147,7 +150,7 @@ public class H2Db {
         return wallpaper;
     }
 
-    private Wallpaper getWallpaper(ResultSet resultSet) throws SQLException {
+    private static Wallpaper getWallpaper(ResultSet resultSet) throws SQLException {
         Wallpaper wallpaper = new Wallpaper();
         wallpaper.setStartdate(resultSet.getString("startdate"));
         wallpaper.setFullstartdate(resultSet.getString("fullstartdate"));
