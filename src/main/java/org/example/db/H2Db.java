@@ -19,8 +19,9 @@ public class H2Db {
 
     static {
         try {
-            TimeZone.setDefault(TimeZone.getTimeZone("UTC+8"));
+            // 设置时区 ，两个中的任意一个都可以
             System.setProperty("user.timezone", "UTC+8");
+            TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));
             Class.forName(DRIVER_CLASS);
         } catch (ClassNotFoundException e) {
             System.err.println("h2数据库驱动类找不到！" + e.getMessage());
