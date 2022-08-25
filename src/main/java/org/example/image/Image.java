@@ -29,6 +29,8 @@ public class Image implements Comparable<Image> {
     private final static String BING_MASTER_URL = "https://cn.bing.com";
     // 必应备用域名
     private final static String BING_BACKIP_URL = "https://s.cn.bing.net";
+    // https://global.bing.com
+    // http://www.bing.com/
     /**
      * BING API
      * format	 返回的数据格式。hp为html格式；js为json格式；其他值为xml格式；缺省（或缺失）将默认返回 XML 文档数据格式

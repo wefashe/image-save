@@ -38,6 +38,18 @@ public class Wallpaper {
         this.title = (String) obj.get("title");
         this.quiz = (String) obj.get("quiz");
         this.hsh = (String) obj.get("hsh");
+    }
+
+    public Wallpaper(String enddate, String url, String urlbase, String copyright,
+                     String copyrightlink, String title, String quiz, String hsh) {
+        this.enddate = enddate;
+        this.url = url;
+        this.urlbase = urlbase;
+        this.copyright = copyright;
+        this.copyrightlink = copyrightlink;
+        this.title = title;
+        this.quiz = quiz;
+        this.hsh = hsh;
         LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC+8"));
         DateTimeFormatter fmt24 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.createtime = now.format(fmt24);
