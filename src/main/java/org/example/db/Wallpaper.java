@@ -25,6 +25,9 @@ public class Wallpaper {
     private String quiz;
     private String hsh;
 
+    public Wallpaper() {
+    }
+
     public Wallpaper(JSONObject obj) {
         this.startdate = (String) obj.get("startdate");
         this.fullstartdate = (String) obj.get("fullstartdate");
