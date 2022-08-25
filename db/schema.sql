@@ -1,16 +1,17 @@
 -- drop table wallpaper if exists;
 create table if not exists wallpaper
 (
-    startdate     varchar(8) not null,
-    fullstartdate varchar(50) not null,
-    enddate       varchar(8) not null,
-    url           varchar(150) not null comment '壁纸地址',
-    urlbase       varchar(100) not null,
-    copyright     varchar(100) not null,
-    copyrightlink varchar(150) not null,
-    title         varchar(50) not null comment '标题',
-    quiz          varchar(150) not null,
-    hsh           varchar(50) not null comment '壁纸hash值',
-    createtime    timestamp not null default current_timestamp comment '创建时间',
-    primary key (hsh)
-) COMMENT='必应壁纸信息';
+    startdate     varchar(8)            default ' ',
+    fullstartdate varchar(50)           default ' ',
+    enddate       varchar(8)   not null default ' ' comment '日期',
+    url           varchar(150) not null default ' ' comment '壁纸地址',
+    urlbase       varchar(100)          default ' ',
+    copyright     varchar(100)          default ' ',
+    copyrightlink varchar(150)          default ' ',
+    title         varchar(50)  not null default ' ' comment '标题',
+    quiz          varchar(150)          default ' ',
+    hsh           varchar(50)           default ' ' comment '壁纸hash值',
+    createtime    timestamp    not null default current_timestamp comment '创建时间',
+    updatetime    timestamp    not null default current_timestamp on update current_timestamp comment '修改时间',
+    primary key (enddate)
+) comment = '壁纸信息表';
