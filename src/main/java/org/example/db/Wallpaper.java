@@ -24,8 +24,6 @@ public class Wallpaper {
     private String title;
     private String quiz;
     private String hsh;
-    private String desc;
-    private String createtime;
 
     public Wallpaper(JSONObject obj) {
         this.startdate = (String) obj.get("startdate");
@@ -40,19 +38,11 @@ public class Wallpaper {
         this.hsh = (String) obj.get("hsh");
     }
 
-    public Wallpaper(String enddate, String url, String urlbase, String copyright,
-                     String copyrightlink, String title, String quiz, String hsh) {
-        this.enddate = enddate;
+    public Wallpaper(String date, String url, String copyright, String title) {
+        this.enddate = date;
         this.url = url;
-        this.urlbase = urlbase;
         this.copyright = copyright;
-        this.copyrightlink = copyrightlink;
         this.title = title;
-        this.quiz = quiz;
-        this.hsh = hsh;
-        LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC+8"));
-        DateTimeFormatter fmt24 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        this.createtime = now.format(fmt24);
     }
 
     public void addDesc(String prefix) {
@@ -62,7 +52,7 @@ public class Wallpaper {
         try {
             body = Jsoup.connect(link).get().body();
             Elements select = body.select("#encycloCanvas .tc_content .ency_desc");
-            this.desc = Jsoup.clean(select.html(), "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+            // this.desc = Jsoup.clean(select.html(), "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
         } catch (IOException e) {
             System.err.println("获取壁纸对应的故事失败！");
         }
@@ -146,21 +136,5 @@ public class Wallpaper {
 
     public void setHsh(String hsh) {
         this.hsh = hsh;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
-    public String getCreatetime() {
-        return createtime;
-    }
-
-    public void setCreatetime(String createtime) {
-        this.createtime = createtime;
     }
 }
