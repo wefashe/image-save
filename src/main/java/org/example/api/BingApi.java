@@ -6,14 +6,14 @@ import java.net.URL;
 
 public class BingApi {
 
-    private final static String[] BING_URL_PREFIXS = {
+    private final static String[] BING_URL_PREFIXES = {
             "https://cn.bing.com1",
             "https://s.cn.bing.net1",
             "https://global.bing.com",
             "https://www.bing.com",
     };
 
-    public static String BING_URL_PREFIX = BING_URL_PREFIXS[0];
+    public static String BING_URL_PREFIX = BING_URL_PREFIXES[0];
 
     /**
      * BING API
@@ -35,7 +35,7 @@ public class BingApi {
     private final static String BING_WALLPAPER_API = "/HPImageArchive.aspx?format=js&idx=%s&n=%s&nc=1612409408851&pid=hp&FORM=BEHPTB&uhd=1&uhdwidth=3840&uhdheight=2160&setmkt=zh-cn&cc=cn";
 
     static {
-        for (String URLName : BING_URL_PREFIXS) {
+        for (String URLName : BING_URL_PREFIXES) {
             if (exists(URLName)) {
                 BING_URL_PREFIX = URLName;
                 break;
