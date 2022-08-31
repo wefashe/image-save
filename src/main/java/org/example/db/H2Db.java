@@ -27,7 +27,7 @@ public class H2Db {
         return DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
     }
 
-    public static int addWallpaper(Wallpaper wallpaper) {
+    public static int addWallpaper2DB(Wallpaper wallpaper) {
         String sql = "merge into wallpaper(startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh)"
                      + "values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')";
         sql = String.format(sql, wallpaper.getStartdate(), wallpaper.getFullstartdate(), wallpaper.getEnddate(),
@@ -48,7 +48,7 @@ public class H2Db {
         return ret;
     }
 
-    public static int batchAddWallpaper(List<Wallpaper> wallpapers) {
+    public static int batchAddWallpaper2DB(List<Wallpaper> wallpapers) {
         String sql = "merge into wallpaper(startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh)"
                      + "values(?,?,?,?,?,?,?,?,?,?)";
         int ret = 0;
@@ -86,7 +86,7 @@ public class H2Db {
         return ret;
     }
 
-    public static int deleteWallpaper(String date) {
+    public static int deleteWallpaper2DB(String date) {
         String sql = "delete from wallpaper where enddate = '" + date + "'";
         int ret = 0;
         Connection connection = null;
@@ -103,7 +103,7 @@ public class H2Db {
         return ret;
     }
 
-    public static List<Wallpaper> getWallpapers(String date) {
+    public static List<Wallpaper> getDBWallpapers(String date) {
         String sql = "select * from wallpaper";
         if (date != null && date.trim().length() != 0) {
             sql += " where enddate like '" + date + "%'";
@@ -129,7 +129,30 @@ public class H2Db {
         return wallpapers;
     }
 
-    public static Wallpaper getWallpaper(String date) {
+    public static List<Wallpaper> getDBWallpapers(int days) {
+        String sql = " select * from wallpaper w where datediff(dd,enddate,current_date) <= " + (days - 1)
+                     + " order by enddate desc";
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        List<Wallpaper> wallpapers = new ArrayList<>();
+        try {
+            connection = getConnection();
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                Wallpaper wallpaper = getWallpaper(resultSet);
+                wallpapers.add(wallpaper);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close(resultSet, statement, connection);
+        }
+        return wallpapers;
+    }
+
+    public static Wallpaper getDBWallpaper(String date) {
         String sql = "select * from wallpaper where enddate = '" + date + "'";
         Connection connection = null;
         Statement statement = null;
