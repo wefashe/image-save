@@ -67,7 +67,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.example.image.MySave</mainClass>
+                            <mainClass>org.example.views.MySave</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

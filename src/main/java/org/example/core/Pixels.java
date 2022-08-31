@@ -1,4 +1,4 @@
-package org.example.image;
+package org.example.core;
 
 /**
  * 已知分辨率

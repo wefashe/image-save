@@ -1,4 +1,4 @@
-package org.example.image;
+package org.example.views;
 
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
@@ -51,7 +51,7 @@ public class MySave {
         YearMonth toYearMonth = YearMonth.of(toDate.getYear(), toDate.getMonthValue());
         List<MdFile> mdFiles = new ArrayList<>();
         while (!fromYearMonth.isAfter(toYearMonth)) {
-            Path path = MdFile.IMAGES_PATH.resolve(String.valueOf(fromYearMonth.getYear()));
+            Path path = MdFile.VIEWS_PATH.resolve(String.valueOf(fromYearMonth.getYear()));
             if (!Files.exists(path)) {
                 fromYearMonth = fromYearMonth.plusYears(1);
                 continue;

@@ -1,6 +1,7 @@
-package org.example.image;
+package org.example.views;
 
 import org.example.api.BingApi;
+import org.example.core.Pixels;
 import org.example.db.Wallpaper;
 
 import javax.imageio.ImageIO;

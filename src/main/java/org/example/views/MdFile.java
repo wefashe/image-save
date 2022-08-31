@@ -1,4 +1,4 @@
-package org.example.image;
+package org.example.views;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public class MdFile extends File {
 
     private final static Path README_PATH = Paths.get("README.md");
-    public final static Path IMAGES_PATH = Paths.get("images");
+    public final static Path VIEWS_PATH = Paths.get("views");
 
     private final static int README_IMAGE_NUM = 30;
 
@@ -48,7 +48,7 @@ public class MdFile extends File {
         LocalDate imageLocalDate = image.getLocalDate();
         String year = String.valueOf(imageLocalDate.getYear());
         String fileName = String.format("%d-%02d.md", imageLocalDate.getYear(), imageLocalDate.getMonthValue());
-        Path path = IMAGES_PATH.resolve(year).resolve(fileName);
+        Path path = VIEWS_PATH.resolve(year).resolve(fileName);
         if (!Files.exists(path.getParent())) {
             Files.createDirectories(path.getParent());
         }
@@ -79,7 +79,7 @@ public class MdFile extends File {
             }
 
             // 获取年份的文件夹，不存在则创建
-            Path path = IMAGES_PATH.resolve(String.valueOf(year));
+            Path path = VIEWS_PATH.resolve(String.valueOf(year));
             if (!Files.exists(path)) {
                 Files.createDirectories(path);
             }
@@ -187,7 +187,7 @@ public class MdFile extends File {
         if (path.equals(README_PATH)) {
             // README.md显示图片的历史归档
             // 找出所有历史归档
-            Stream<Path> pathStream = Files.walk(IMAGES_PATH);
+            Stream<Path> pathStream = Files.walk(VIEWS_PATH);
             List<String> list = new ArrayList<>();
             pathStream.filter(pathTemp -> pathTemp.toString().endsWith(".md")).sorted((o1, o2) -> {
                 // 按时间进行排序
