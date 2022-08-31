@@ -1,6 +1,8 @@
-package org.example.views;
+package org.example.main;
 
 import org.apache.commons.io.FileUtils;
+import org.example.views.Image;
+import org.example.views.MdFile;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -31,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class MySave {
+public class StartUp {
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             // 保存今天壁纸

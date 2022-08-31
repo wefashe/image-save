@@ -67,7 +67,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.example.views.MySave</mainClass>
+                            <mainClass>org.example.main.StartUp</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -1,7 +1,6 @@
-package org.example.db;
+package org.example.views;
 
-public class H2Test {
-
+public class ViewTest {
     public static void main(String[] args) {
         // TODO test
     }
