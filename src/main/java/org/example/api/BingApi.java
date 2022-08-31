@@ -17,8 +17,8 @@ import java.util.Objects;
 public class BingApi {
 
     private final static String[] BING_URL_PREFIXES = {
-            "https://cn.bing.com1",
-            "https://s.cn.bing.net1",
+            "https://cn.bing.com",
+            "https://s.cn.bing.net",
             "https://global.bing.com",
             "https://www.bing.com",
     };
@@ -43,6 +43,15 @@ public class BingApi {
      * video     可选	取值范围 [0, 1]，缺省（或缺失）则默认为“0”，则不返回相应的流媒体信息（音频/视频），并不是每天都有流媒体视音频的，需要根据返回的字段键值对做判断。
      */
     private final static String BING_WALLPAPER_API = "/HPImageArchive.aspx?format=js&idx=%s&n=%s&nc=1612409408851&pid=hp&FORM=BEHPTB&uhd=1&uhdwidth=3840&uhdheight=2160&setmkt=zh-cn&cc=cn";
+
+    /**
+     * 获取当日的壁纸故事
+     * 已经不维护了，现只能获取21年前历史壁纸的内容
+     * 例如：https://cn.bing.com/cnhp/coverstory?d=20181118
+     *
+     * @deprecated
+     */
+    private final static String BING_COVERSTORY_API = "/cnhp/coverstory?d=%s";
 
     static {
         for (String URLName : BING_URL_PREFIXES) {
@@ -108,5 +117,28 @@ public class BingApi {
             return null;
         }
         return wallpapers.get(0);
+    }
+
+    public static String getApiCoverstory(String date) {
+        String api = BING_URL_PREFIX + String.format(BING_COVERSTORY_API, date);
+        String json = null;
+        try {
+            json = IOUtils.toString(URI.create(api), StandardCharsets.UTF_8);
+
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+        if (Objects.isNull(json) || json.isEmpty()) {
+            return "";
+        }
+        JSONObject jsonObj = JSONObject.parseObject(json);
+        if (jsonObj == null) {
+            return "";
+        }
+        String coverstory = jsonObj.getString("para1");
+        if (coverstory == null) {
+            coverstory = "";
+        }
+        return coverstory;
     }
 }
