@@ -1,8 +1,18 @@
 package org.example.api;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.io.IOUtils;
+import org.example.db.Wallpaper;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 public class BingApi {
 
@@ -60,7 +70,7 @@ public class BingApi {
         }
     }
 
-    public static String getBingWallpaperApi(int idx, int num) {
+    private static String getBingWallpaperApi(int idx, int num) {
         idx = Math.max(0, idx);
         idx = Math.min(7, idx);
         num = Math.max(1, num);
@@ -68,7 +78,35 @@ public class BingApi {
         return BING_URL_PREFIX + String.format(BING_WALLPAPER_API, idx, num);
     }
 
-    public static String getTodayBingWallpaperApi() {
-        return getBingWallpaperApi(0, 1);
+    public static List<Wallpaper> getApiWallpapers(int idx, int num) {
+        String api = BingApi.getBingWallpaperApi(idx, num);
+        String json = null;
+        try {
+            json = IOUtils.toString(URI.create(api), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+        if (Objects.isNull(json) || json.isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+        JSONObject jsonObj = JSONObject.parseObject(json);
+        if (jsonObj == null) {
+            return Collections.EMPTY_LIST;
+        }
+        JSONArray jsonArr = jsonObj.getJSONArray("images");
+        if (jsonArr == null || jsonArr.isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+        return jsonArr.toJavaList(Wallpaper.class);
+    }
+
+    public static Wallpaper getTodayApiWallpaper() {
+        int idx = 0;
+        int num = 1;
+        List<Wallpaper> wallpapers = getApiWallpapers(idx, num);
+        if (wallpapers.isEmpty()) {
+            return null;
+        }
+        return wallpapers.get(0);
     }
 }
