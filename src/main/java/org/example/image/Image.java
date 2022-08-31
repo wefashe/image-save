@@ -1,10 +1,6 @@
 package org.example.image;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.io.IOUtils;
-import org.example.db.H2Db;
+import org.example.api.BingApi;
 import org.example.db.Wallpaper;
 
 import javax.imageio.ImageIO;
@@ -12,8 +8,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -24,41 +18,6 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Image implements Comparable<Image> {
-
-    // 必应主域名
-    private final static String BING_MASTER_URL = "https://cn.bing.com";
-    // 必应备用域名
-    private final static String BING_BACKIP_URL = "https://s.cn.bing.net";
-    // https://global.bing.com
-    // http://www.bing.com/
-    /**
-     * BING API
-     * format	 返回的数据格式。hp为html格式；js为json格式；其他值为xml格式；缺省（或缺失）将默认返回 XML 文档数据格式
-     * idx	     获取特定时间点的数据。如idx=1表示前一天（昨天），依此类推。经过测试最大值为7，缺省（或缺失）则默认为“0”，表示今天的美图。
-     * n	     获取数据的条数。经测试，配合上idx最大可以获取到13天前的数据，即idx=7&n=7，必选	缺省（或缺失）将返回 null（空值），导致无法获取美图信息。表示从“idx”指定的日期开始往前推共“n”张美图信息。
-     * pid	     未知。pid为hp时，copyrightlink返回的是相对地址。pid不为hp时，没有看到og信息
-     * ensearch	 指定获取必应【国际版/国内版】的每日一图。当ensearch=1时，获取到的是必应国际版的每日一图数据。默认情况和其他值情况下，获取到的是必应国内版的每日一图数据
-     * quiz	     当quiz=1时，返回必应小测验所需的相关数据。
-     * og	     水印图相关的信息。包含了title、img、desc和hash等信息
-     * uhd	     当uhd=1时，可以自定义图片的宽高。当uhd=0时，返回的是固定宽高（1920x1080）的图片数据
-     * uhdwidth	 图片宽度。当uhd=1时生效。最大值为3840，超过这个值当作3840处理
-     * uhdheight 图片高度。当uhd=1时生效。最大值为2592，超过这个值当作2592处理
-     * setmkt	 指定图片相关的区域信息。如图片名中包含的EN-CN、EN-US或者ZH-CN等。参考值：en-us、zh-cn等
-     * setlang	 指定返回数据所使用的语言。参考值：en-us、zh-cn等
-     * cc	     可选	国家（含地区）代码（Country Code）的英文缩写，表示获取相应地区的必应美图（需要国外主机，国内主机请求一律返回中国区的必应美图），目前已知的可取值范围 {ar、at、au、be、br、ca、ch、cl、cn、de、dk、es、fi、fr、hk、ie、in、it、jp、kr、nl、no、nz、ph、pt、ru、se、sg、tw、uk}，对应的地区请对照此列表 → 传送门，缺省（或缺失）将自动根据请求源 IP 所在的地区返回相应地区的美图信息（划重点，并非每个地区都有属于自己独一无二的美图，未预设美图的地区将直接引用国际版 Bing 美图。另外在配合国外主机使用此参数时抓取信息时，需要使用国际版或其它地区的必应首页地址，例如“www.bing.com”，才能获取到相应“cc”地区的美图，否则一律返回中国区的美图信息。
-     * video     可选	取值范围 [0, 1]，缺省（或缺失）则默认为“0”，则不返回相应的流媒体信息（音频/视频），并不是每天都有流媒体视音频的，需要根据返回的字段键值对做判断。
-     */
-    private final static String BING_IMAGE_API = "/HPImageArchive.aspx?format=js&idx=%s&n=%s&nc=1612409408851&pid=hp&FORM=BEHPTB&uhd=1&uhdwidth=3840&uhdheight=2160&setmkt=zh-cn&cc=cn";
-    /**
-     * 获取当日的壁纸故事
-     * 已经不维护了，现只能获取21年前历史壁纸的内容
-     * 例如：https://cn.bing.com/cnhp/coverstory?d=20181118
-     *
-     * @deprecated
-     */
-    private final static String BING_COVERSTORY_API = "/cnhp/coverstory?d=%s";
-
-    public static String BING_URL = BING_MASTER_URL;
 
     private String date;
     private String url;
@@ -83,19 +42,6 @@ public class Image implements Comparable<Image> {
         this.alt = alt;
         this.link = link;
         this.maxPixelUrlMap = new HashMap<>();
-    }
-
-    public static String getBingImageApi(int idx, int num) {
-        idx = Math.max(0, idx);
-        idx = Math.min(7, idx);
-
-        num = Math.max(1, num);
-        num = Math.min(8, num);
-        return String.format(makeFullUrl(BING_IMAGE_API), idx, num);
-    }
-
-    public static String getBingCoverstoryApi(String date) {
-        return String.format(makeFullUrl(BING_COVERSTORY_API), date);
     }
 
     public LocalDate getLocalDate() {
@@ -146,7 +92,7 @@ public class Image implements Comparable<Image> {
     }
 
     private static String makeFullUrl(String url) {
-        return BING_URL + url;
+        return BingApi.BING_URL_PREFIX + url;
     }
 
     public Map<String, String> getMaxPixelUrl() {
@@ -267,58 +213,27 @@ public class Image implements Comparable<Image> {
         return this.date + this.title + System.lineSeparator() + this.url + System.lineSeparator() + this.getDesc();
     }
 
-    public static Image getImageByJson(JSONObject obj) {
-        Wallpaper wallpaper = new Wallpaper(obj);
-        wallpaper.addDesc(Image.BING_URL);
-        H2Db.addWallpaper(wallpaper);
-
-        String date = (String) obj.get("enddate");
-        String url = (String) obj.get("url");
-        String title = (String) obj.get("title");
-        String desc = (String) obj.get("copyright");
-        String alt = (String) obj.get("urlbase");
-        String copyrightlink = (String) obj.get("copyrightlink");
-        String fullstartdate = (String) obj.get("fullstartdate");
+    public static Image getImageByJson(Wallpaper wallpaper) {
+        String date = wallpaper.getEnddate();
+        String url = wallpaper.getUrl();
+        String title = wallpaper.getTitle();
+        String desc = wallpaper.getCopyright();
+        String alt = wallpaper.getUrlbase();
+        String copyrightlink = wallpaper.getCopyrightlink();
+        String fullstartdate = wallpaper.getFullstartdate();
         String hpDate = fullstartdate.substring(0, 8) + "_" + fullstartdate.substring(8);
         String link = copyrightlink + "&filters=HpDate:\"" + hpDate + "\"";
         return new Image(date, url, title, desc, alt, link);
-    }
-
-    private static JSONObject[] getImageJSONObject(int idx, int num) throws IOException {
-        boolean flag = true;
-        String jsonText = null;
-        while (flag) {
-            try {
-                String bingImageApi = Image.getBingImageApi(idx, num);
-                jsonText = IOUtils.toString(URI.create(bingImageApi), StandardCharsets.UTF_8);
-                flag = false;
-            } catch (UnknownHostException e) {
-                if (BING_BACKIP_URL.equals(BING_URL)) {
-                    flag = false;
-                } else {
-                    BING_URL = BING_BACKIP_URL;
-                }
-            }
-        }
-        if (Objects.isNull(jsonText) || jsonText.isEmpty()) {
-            throw new IOException(BING_IMAGE_API + "接口获取数据失败！");
-        }
-        JSONArray array = JSON.parseObject(jsonText).getJSONArray("images");
-        if (Objects.isNull(array) || array.isEmpty()) {
-            throw new IOException(BING_IMAGE_API + "接口获取图片数据失败！");
-        }
-        return array.toArray(new JSONObject[0]);
     }
 
     /**
      * 获取今天的壁纸
      *
      * @return
-     * @throws IOException
      */
-    public static Image getTodayImage() throws IOException {
-        JSONObject[] imageJSONObjects = getImageJSONObject(0, 1);
-        return getImageByJson(imageJSONObjects[0]);
+    public static Image getTodayImage() {
+        Wallpaper todayApiWallpaper = BingApi.getTodayApiWallpaper();
+        return getImageByJson(todayApiWallpaper);
     }
 
     /**
@@ -330,9 +245,9 @@ public class Image implements Comparable<Image> {
      * @throws IOException
      */
     public static List<Image> getImages(int idx, int num) throws IOException {
-        JSONObject[] imageJSONObjects = getImageJSONObject(idx, num);
+        List<Wallpaper> wallpapers = BingApi.getApiWallpapers(idx, num);
         List<Image> images = new ArrayList<>();
-        for (JSONObject obj : imageJSONObjects) {
+        for (Wallpaper obj : wallpapers) {
             images.add(getImageByJson(obj));
         }
         return images;
