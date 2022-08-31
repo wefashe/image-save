@@ -18,13 +18,19 @@ public class H2Db {
     // 嵌入式 只允许有一个客户端连接到H2数据库 服务器模式可以同时多个客户端，但需要单独启动数据库服务
     private static final String JDBC_URL = "jdbc:h2:./db/images;AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1;MODE=MySQL;INIT=RUNSCRIPT FROM 'db/schema.sql'";
 
+    private static ThreadLocal<Connection> threadLocal = new ThreadLocal<>();
 
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
-        // 设置时区 ，两个中的任意一个都可以
-        System.setProperty("user.timezone", "UTC+8");
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));
-        Class.forName(DRIVER_CLASS);
-        return DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+        Connection conn = threadLocal.get();
+        if (conn == null) {
+            // 设置时区 ，两个中的任意一个都可以
+            System.setProperty("user.timezone", "UTC+8");
+            TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));
+            Class.forName(DRIVER_CLASS);
+            conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+            threadLocal.set(conn);
+        }
+        return conn;
     }
 
     public static int addWallpaper2DB(Wallpaper wallpaper) {

@@ -6,7 +6,7 @@ import org.example.db.Wallpaper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
@@ -20,8 +20,7 @@ public class Deals {
 
     public static Wallpaper getTodayWallpaper(){
         LocalDate now = LocalDate.now(ZoneId.of("UTC+8"));
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
-        Wallpaper todayWallpaper = H2Db.getDBWallpaper(now.format(fmt));
+        Wallpaper todayWallpaper = H2Db.getDBWallpaper(now.format(DateTimeFormatter.BASIC_ISO_DATE));
         if (todayWallpaper != null) {
             return todayWallpaper;
         }
@@ -32,7 +31,7 @@ public class Deals {
         return todayWallpaper;
     }
 
-    public static String getCoverstory(Wallpaper wallpaper){
+    public static String getCoverstoryLink(Wallpaper wallpaper) {
         String fullstartdate = wallpaper.getFullstartdate();
         if (fullstartdate == null || fullstartdate.trim().isEmpty()) {
             fullstartdate = wallpaper.getEnddate() + "1600";
@@ -51,12 +50,16 @@ public class Deals {
         }
         String prefix = BingApi.BING_URL_PREFIX;
         String hpDate = fullstartdate.substring(0, 8) + "_" + fullstartdate.substring(8);
-        String link = prefix + copyrightlink + "&filters=HpDate:\"" + hpDate + "\"";
+        return prefix + copyrightlink + "&filters=HpDate:\"" + hpDate + "\"";
+    }
+
+    public static String getCoverstory(Wallpaper wallpaper){
+        String coverstoryLink = getCoverstoryLink(wallpaper);
         String coverstory = "";
         try {
-            Element body = Jsoup.connect(link).get().body();
+            Element body = Jsoup.connect(coverstoryLink).get().body();
             Elements select = body.select("#encycloCanvas .tc_content .ency_desc");
-            coverstory = Jsoup.clean(select.html(), "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+            coverstory = Jsoup.clean(select.html(), "", Safelist.none(), new Document.OutputSettings().prettyPrint(false));
         } catch (IOException e) {
             System.err.println("获取壁纸对应的故事失败！");
         }
@@ -64,6 +67,13 @@ public class Deals {
             coverstory = BingApi.getApiCoverstory(wallpaper.getEnddate());
         }
         return coverstory;
+    }
+
+    public static String getPixelUrl(String url, Pixels pixel) {
+        url = url.replace("UHD", pixel.getResolution());
+        url = url.replace("3840", String.valueOf(pixel.getWidth()));
+        url = url.replace("2160", String.valueOf(pixel.getHeight()));
+        return url;
     }
 
 }

@@ -34,11 +34,23 @@ public enum Pixels {
     private int width;
     private int height;
 
-
     Pixels(String resolution, int width, int height) {
         this.resolution = resolution;
         this.width = width;
         this.height = height;
+    }
+
+    public static Pixels getPixel(int width, int height) {
+        Pixels[] pixels = Pixels.values();
+        for (Pixels pixel : pixels) {
+            if (pixel.getHeight() <= height && pixel.getWidth() <= width) {
+                return pixel;
+            }
+        }
+        if (PIX_UHD_7680X4320.getWidth() < width && PIX_UHD_7680X4320.getHeight() < height) {
+            return PIX_UHD_7680X4320;
+        }
+        return PIX_UHD_3840X2160;
     }
 
 
