@@ -13,8 +13,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Deals {
@@ -30,6 +32,14 @@ public class Deals {
             H2Db.addWallpaper2DB(todayWallpaper);
         }
         return todayWallpaper;
+    }
+
+    public static List<Wallpaper> getMonthWallpaper(YearMonth yearMonth){
+        YearMonth currentYearMonth = YearMonth.now(ZoneId.of("UTC+8"));
+        if (currentYearMonth.equals(yearMonth)) {
+            getTodayWallpaper();
+        }
+        return H2Db.getDBWallpapers( yearMonth.format( DateTimeFormatter.ISO_LOCAL_DATE));
     }
 
     public static List<Wallpaper> getWallpapers(int idx, int num){
