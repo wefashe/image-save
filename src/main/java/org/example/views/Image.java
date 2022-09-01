@@ -1,6 +1,7 @@
 package org.example.views;
 
 import org.example.api.BingApi;
+import org.example.core.Deals;
 import org.example.core.Pixels;
 import org.example.db.Wallpaper;
 
@@ -233,7 +234,7 @@ public class Image implements Comparable<Image> {
      * @return
      */
     public static Image getTodayImage() {
-        Wallpaper todayApiWallpaper = BingApi.getTodayApiWallpaper();
+        Wallpaper todayApiWallpaper = Deals.getTodayWallpaper();
         return getImageByJson(todayApiWallpaper);
     }
 
@@ -246,7 +247,7 @@ public class Image implements Comparable<Image> {
      * @throws IOException
      */
     public static List<Image> getImages(int idx, int num) throws IOException {
-        List<Wallpaper> wallpapers = BingApi.getApiWallpapers(idx, num);
+        List<Wallpaper> wallpapers = Deals.getWallpapers(idx, num);
         List<Image> images = new ArrayList<>();
         for (Wallpaper obj : wallpapers) {
             images.add(getImageByJson(obj));

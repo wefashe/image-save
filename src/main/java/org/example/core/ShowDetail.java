@@ -31,7 +31,11 @@ public class ShowDetail {
         this.title = wallpaper.getTitle();
         String copyright = wallpaper.getCopyright();
         this.alt = copyright.substring(0, copyright.indexOf(" "));
-        this.author = copyright.substring(copyright.indexOf("©")+1, copyright.lastIndexOf("/")).trim();
+        int endIndex = copyright.lastIndexOf("/");
+        if (endIndex == -1) {
+            endIndex = copyright.lastIndexOf(")");
+        }
+        this.author = copyright.substring(copyright.indexOf("©") + 1, endIndex).trim();
         this.coverstoryLink = Deals.getCoverstoryLink(wallpaper);
         String url = BingApi.BING_URL_PREFIX + wallpaper.getUrl();
         this.smallLink = url.replace("3840", "384").replace("2160", "216");
@@ -55,7 +59,7 @@ public class ShowDetail {
         try {
             sourceImg = ImageIO.read(new URL(url));
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
             return Pixels.PIX_UHD_3840X2160;
         }
         int width = sourceImg.getWidth();

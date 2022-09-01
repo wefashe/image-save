@@ -15,6 +15,7 @@ import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class Deals {
 
@@ -29,6 +30,22 @@ public class Deals {
             H2Db.addWallpaper2DB(todayWallpaper);
         }
         return todayWallpaper;
+    }
+
+    public static List<Wallpaper> getWallpapers(int idx, int num){
+        idx = Math.max(0, idx);
+        idx = Math.min(7, idx);
+        num = Math.max(1, num);
+        num = Math.min(8, num);
+        List<Wallpaper> wallpapers = H2Db.getDBWallpapers(idx, num);
+        if (wallpapers != null && wallpapers.size() == num) {
+            return wallpapers;
+        }
+        wallpapers = BingApi.getApiWallpapers(idx, num);
+        if (wallpapers != null && wallpapers.size() == num) {
+            H2Db.batchAddWallpaper2DB(wallpapers);
+        }
+        return wallpapers;
     }
 
     public static String getCoverstoryLink(Wallpaper wallpaper) {

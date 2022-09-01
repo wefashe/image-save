@@ -6,6 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
@@ -20,13 +23,20 @@ public class H2Db {
 
     private static ThreadLocal<Connection> threadLocal = new ThreadLocal<>();
 
-    public static Connection getConnection() throws SQLException, ClassNotFoundException {
-        Connection conn = threadLocal.get();
-        if (conn == null) {
+    static {
+        try {
             // 设置时区 ，两个中的任意一个都可以
             System.setProperty("user.timezone", "UTC+8");
             TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));
             Class.forName(DRIVER_CLASS);
+        } catch (ClassNotFoundException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public static Connection getConnection() throws SQLException {
+        Connection conn = threadLocal.get();
+        if (conn == null) {
             conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
             threadLocal.set(conn);
         }
@@ -135,6 +145,33 @@ public class H2Db {
         return wallpapers;
     }
 
+    public static List<Wallpaper> getDBWallpapers(int idx, int num) {
+        LocalDate now = LocalDate.now(ZoneId.of("UTC+8"));
+        LocalDate startDate = now.minusDays(idx);
+        String sql = "select * from wallpaper where datediff(day,enddate,'" + startDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+                     + "') >= 0 and datediff(day,enddate,'" + startDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+                     + "') < " + num
+                     + " order by enddate desc";
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        List<Wallpaper> wallpapers = new ArrayList<>();
+        try {
+            connection = getConnection();
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                Wallpaper wallpaper = getWallpaper(resultSet);
+                wallpapers.add(wallpaper);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close(resultSet, statement, connection);
+        }
+        return wallpapers;
+    }
+
     public static List<Wallpaper> getDBWallpapers(int days) {
         String sql = " select * from wallpaper w where datediff(dd,enddate,current_date) <= " + (days - 1)
                      + " order by enddate desc";
@@ -213,6 +250,7 @@ public class H2Db {
         if (connection != null) {
             try {
                 connection.close();
+                threadLocal.remove();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
