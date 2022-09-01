@@ -103,4 +103,12 @@ public class Deals {
         return url;
     }
 
+    public static List<Image> toImageList(List<Wallpaper> wallpapers) {
+        List<Image> images = new ArrayList<>();
+        for (Wallpaper wallpaper : wallpapers) {
+            images.add(new Image(wallpaper));
+        }
+        return images;
+    }
+
 }
