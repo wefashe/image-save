@@ -216,6 +216,15 @@ public class H2Db {
         return wallpaper;
     }
 
+    public static List<String> getMissDate(){
+        // TODO 查询漏失的日期
+        // select date(r1.enddate) + 1 missing_date
+        // from wallpaper r1 left outer join wallpaper r2
+        // on date(r1.enddate) = date(r2.enddate) - 1
+        // where  r2.enddate is null;
+        return null;
+    }
+
     private static Wallpaper getWallpaper(ResultSet resultSet) throws SQLException {
         Wallpaper wallpaper = new Wallpaper();
         wallpaper.setStartdate(resultSet.getString("startdate"));
