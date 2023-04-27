@@ -16,6 +16,53 @@ import java.util.Objects;
 
 public class BingApi {
 
+//    1、mkt参数非常有用！你认为没用是因为bing有国内特服，需要用国际版
+//    2、"wp":true的图像才可以用作壁纸，完全分辨率为1920*1200
+//    3、也有4K等更高清的图像，但接口不太稳定
+//     附我用的接口，从2015年至今大约下了3600张了
+//"BingUrls": [
+//    {
+//        "Url": "http://global.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&setmkt=en-us"
+//    },
+//    {
+//        "Url": "http://global.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&setmkt=zh-cn"
+//    },
+//    {
+//        "Url": "http://global.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&setmkt=ja-jp"
+//    },
+//    {
+//        "Url": "http://global.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&setmkt=en-ww"
+//    },
+//    {
+//        "Url": "http://global.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&setmkt=en-gb"
+//    },
+//    {
+//        "Url": "http://global.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&setmkt=en-au"
+//    },
+//    {
+//        "Url": "http://global.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&setmkt=en-ca"
+//    },
+//    {
+//        "Url": "http://global.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&setmkt=fr-fr"
+//    },
+//    {
+//        "Url": "http://global.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&setmkt=de-de"
+//    },
+//    {
+//        "Url": "http://global.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&setmkt=pt-br"
+//    }
+//        ],
+//   https://wallpaperhub.app/
+
+//    global 即: 国际版、全球版
+//    setlang=en-us 即: 设置 (set) 界面语言 (lang)为美国英语 (代码: en-us)
+//    setmkt=en-us 即: 设置 (set) 地区 (mkt) 搜索返回的结果为美国英语 (代码: en-us)。
+//    或者使用以下地址也是可以的: https://global.bing.com/?mkt=en-USG&setlang=en-us
+//    // 打开一次后，必应会将地区写入你的 cookies，下次直接使用 https://global.binq.com巴就能内以应国乐东
+//    你想要美国版，就 setmkt=en-us
+//    日本版，就 setmkt=ja-jp
+//    http://cn.bing.com/az/hprichbg/rb/RainierDawn_ZH-CN9182470816_1920x1080.jpg
+
     private final static String[] BING_URL_PREFIXES = {
             "https://cn.bing.com",
             "https://s.cn.bing.net",
